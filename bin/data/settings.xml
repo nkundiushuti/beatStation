@@ -1,0 +1,5 @@
+<settings>
+    <midiPort>0</midiPort>
+    <midiChannel>10</midiChannel>
+    <midiNote>46</midiNote>
+</settings>
