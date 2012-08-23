@@ -51,8 +51,10 @@ void testApp::setup() {
     
     //GUI USER
     gui1 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)    
-    gui1->addWidgetDown(new ofxUILabel("INTRODUCE YOUR INITIALS OR YOUR ID IF YOU ARE ALREADY REGISTERED", OFX_UI_FONT_LARGE));     
+    gui1->addWidgetDown(new ofxUILabel("IF YOU ARE A NEW USER, ENTER YOUR INITIALS", OFX_UI_FONT_MEDIUM));   
+     gui1->addWidgetDown(new ofxUILabel("IF YOU ARE ALREADY REGISTERED, CLICK ON EXISTING AND ENTER YOUR ID", OFX_UI_FONT_MEDIUM)); 
     gui1->addSpacer(length-xInit, 2); 
+    
     
     vector<string> vnames; vnames.push_back("NEW"); vnames.push_back("EXISTING"); 
     ofxUIRadio *radio = (ofxUIRadio *) gui1->addWidgetDown(new ofxUIRadio("USER", vnames, OFX_UI_ORIENTATION_VERTICAL, dim, dim )); 
@@ -135,8 +137,9 @@ void testApp::update() {
     
         //update playing widget
         ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
-        if (beats.getPosition() > 0.94) rotary->setValue(100);
-        else rotary->setValue(beats.getPosition()*100);
+        //if (beats.getPosition() > 0.99) rotary->setValue(100);
+        //else 
+            rotary->setValue(beats.getPosition()*100);
     }
     
     ofxUISlider *volume = (ofxUISlider *) gui2->getWidget("VOL");
@@ -702,10 +705,15 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
             songN->setLabel(label2);
             
             //LOAD THE TAPPING GUI
+            toggleInstructions = TRUE;
             errors->setVisible(FALSE);            
             gui1->disable();
             gui2->enable();
             button->setValue(FALSE);
+            ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
+            rotary->setValue(0.0);        
+            ofxUISlider *volume = (ofxUISlider *) gui2->getWidget("VOL");
+            beats.setVolume(75);
         }
     }  
     
@@ -759,6 +767,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             saveXmlTap(text.str());                       
             
             //load gui
+            toggleInstructions = FALSE;
             gui2->disable();
             gui3->enable();
             button->setValue(FALSE);
@@ -766,6 +775,8 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         else if (played>0) //move to the next sound if the current sound has been played
         {       
             usert.currentSound++;
+            
+            if (usert.currentSound > 0) toggleInstructions = FALSE;
             
             //load the next sound     
             beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);            
@@ -805,10 +816,15 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         usert.currentSound = 0;
         usert.deleteTranscription();
         
-        //load gui
+        //load the gui1     
+        toggleInstructions = FALSE;
+        button->setValue(FALSE);
+        ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
+        radio->activateToggle("NEW"); 
+        ofxUILabel *label = (ofxUILabel *) gui1->getWidget("INITIALS");
+        label->setLabel("INITIALS");
         gui2->disable();
-        gui1->enable();
-        button->setValue(FALSE);        
+        gui1->enable();         
     }
     
     if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))	
@@ -837,10 +853,17 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
         //syncronize data
         //loadXmlUser("data/users.xml");              
         
-        //load the gui1            
+        //load the gui1     
+        toggleInstructions = FALSE;
+        button->setValue(FALSE);
+        ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
+        radio->activateToggle("NEW"); 
+        ofxUILabel *label = (ofxUILabel *) gui1->getWidget("INITIALS");
+        label->setLabel("INITIALS");
         gui3->disable();
         gui1->enable();  
-        button->setValue(FALSE);
+        
+        
         
         //prevent starting if clicked right away - solved a bug of button class
         //if ( (ofGetElapsedTimef() - clickTime ) < 1)  {clickTime = ofGetElapsedTimef(); return;}   
