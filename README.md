@@ -4,7 +4,7 @@ beatStation
 beatStation - an openFrameworks tapping recorder interface 
 
 The .app that you can find in the bin directory was built on Mac OS Lion and I suggest rebuilding it on your system. 
-You need to download openFrameworks and copy the beatStation directory into the myapps directory and then build it and run it.
+You need to download openFrameworks and copy the beatStation directory into the /apps/myapps directory and then build it and run it.
 
 The app has an user management system and a tapping recording system.
 
