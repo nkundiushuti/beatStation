@@ -5,21 +5,12 @@ void testApp::setup() {
 	//ofSetVerticalSync(true);
 	//ofBackground(255, 255, 255);
 	//ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetEscapeQuitsApp(FALSE);
+    
     
     //LOAD SETTINGS
-    loadXmlSettings("settings.xml"); 
+    loadXmlSettings("settings.xml");    
     
-    //load instructions
-    ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
-    instructions = buffer.getText();     
-    //resize instructions
-    for(int i = 60; i < instructions.length(); i= i + 70){  
-        int pos = instructions.find(' ', i);  
-        if(pos != string::npos){  
-            instructions.replace(pos, 1, "\n");  
-        }  
-    }  
-
         
     //LOAD USERS 
     nrUsers = 0;
@@ -52,7 +43,7 @@ void testApp::setup() {
     
     
     /////////// INITIALIZE GUI 
-    float dim = 24; 
+    float dim = itemDimGUI; 
     float xInit = OFX_UI_GLOBAL_WIDGET_SPACING; 
     float length = ofGetHeight()-xInit;
     vector<string> names; 
@@ -97,7 +88,6 @@ void testApp::setup() {
     
     gui2->addWidgetDown(new ofxUIButton("INSTRUCTIONS",false, dim*2, dim*2));
     //gui2->addSpacer(length-xInit, 2);  
-    gui2->addWidgetSouthOf(new ofxUILabel(dim*5,dim*10,length,"GUIDE",instructions, OFX_UI_FONT_SMALL),"INSTRUCTIONS");
     gui2->addWidgetEastOf(new ofxUIButton("QUIT",false, dim*2, dim*2),"INSTRUCTIONS");
     
     
@@ -123,6 +113,14 @@ void testApp::setup() {
     gui3->setDrawBack(false);
     
     
+    
+    //LOAD INSTRUCTIONS
+    toggleInstructions = FALSE;
+    ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
+    instructions.init("GUI/NewMedia Fett.ttf", 12);
+    instructions.setText(buffer.getText());
+    instructions.wrapTextX(length);     
+    instructions.setColor(240, 240, 240, 180);
 }
 
 //--------------------------------------------------------------
@@ -137,7 +135,8 @@ void testApp::update() {
     
         //update playing widget
         ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
-        rotary->setValue(beats.getPosition()*100);
+        if (beats.getPosition() > 0.94) rotary->setValue(100);
+        else rotary->setValue(beats.getPosition()*100);
     }
     
     ofxUISlider *volume = (ofxUISlider *) gui2->getWidget("VOL");
@@ -150,6 +149,15 @@ void testApp::draw() {
     
     // update the sound playing system:
 	ofSoundUpdate();	
+    
+    if (toggleInstructions)
+    {
+        //draw instructions
+        //instructions.drawJustified(0, 0, instructions.getWidth());
+        ofxUIButton *button = (ofxUIButton *) gui2->getWidget("INSTRUCTIONS");
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect(); 
+        instructions.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
+    }
 }
 
 //--------------------------------------------------------------
@@ -176,10 +184,24 @@ void testApp::newMidiMessage(ofxMidiMessage& msg) {
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key) {
+    
     switch (key) {
         case ' ':
             //add time stamp to the transcription vector
-            if (beats.getIsPlaying())  usert.sounds[usert.currentSound].time.push_back( beats.getPositionMS() ); 
+            if ((tapWithSpace) && (beats.getIsPlaying()))  
+                usert.sounds[usert.currentSound].time.push_back( beats.getPositionMS() ); 
+            break;
+        case 1:
+            OF_EXIT_APP(0); 
+            //cout << "1 pressed " << endl;
+            break; 
+        case 26:
+            OF_EXIT_APP(0); 
+            //cout << "z pressed " << endl;
+            break; 
+        case OF_KEY_ESC:
+            //cout << "esc pressed " << endl;
+            OF_EXIT_APP(0); 
             break;
         default:
             break;
@@ -222,6 +244,10 @@ void testApp::loadXmlSettings(string fileName)
             midiPort = xmlSet.getValue("midiPort", 0);
             midiChannel = xmlSet.getValue("midiChannel", 10);
             midiNote = xmlSet.getValue("midiNote", 46); 
+            noPlays = xmlSet.getValue("noPlays", 2);
+            if (xmlSet.getValue("tapWithSpace", 1)) tapWithSpace = TRUE;
+            else tapWithSpace = FALSE;
+            itemDimGUI = xmlSet.getValue("itemDimGUI", 24);
                     
             xmlSet.popTag();  
         }
@@ -229,14 +255,18 @@ void testApp::loadXmlSettings(string fileName)
             midiPort = 0;
             midiChannel = 10;
             midiNote = 46;
-            instructions="";
+            noPlays = 2;
+            tapWithSpace = TRUE;
+            itemDimGUI = 24;
         }
     }
     else {
         midiPort = 0;
         midiChannel = 10;
         midiNote = 46;
-        instructions="";
+        noPlays = 2;
+        tapWithSpace = TRUE;
+        itemDimGUI = 24;
     }
     
 }
@@ -704,7 +734,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
     //play a song
 	if ((e.widget->getName() == "PLAY") && (button->getValue()==1))	
     {         
-        if ((!beats.getIsPlaying()) && (played<3)) {
+        if ((!beats.getIsPlaying()) && (played<(noPlays+1))) {
             //update playing widget
             ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
             rotary->setValue(0.0);
@@ -783,9 +813,8 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
     
     if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))	
     { 
-        ofxUILabel *instr = (ofxUILabel *) gui2->getWidget("GUIDE");
-        //instr->setLabel(instructions);
-        instr->toggleVisible();
+        //show/hide the instructions
+        toggleInstructions = !toggleInstructions;
     }
     
 }

@@ -22,6 +22,7 @@
 		DF52535215E53090002AA771 /* ofxRtMidiIn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF52534915E53090002AA771 /* ofxRtMidiIn.cpp */; };
 		DF52535315E53090002AA771 /* ofxRtMidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF52534B15E53090002AA771 /* ofxRtMidiOut.cpp */; };
 		DF52535415E53090002AA771 /* RtMidi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF52535015E53090002AA771 /* RtMidi.cpp */; };
+		DF82663B15E6381D0000CBBE /* ofxTextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF82663815E6381D0000CBBE /* ofxTextBlock.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
 		E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */; };
@@ -140,6 +141,9 @@
 		DF52534F15E53090002AA771 /* RtError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RtError.h; sourceTree = "<group>"; };
 		DF52535015E53090002AA771 /* RtMidi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RtMidi.cpp; sourceTree = "<group>"; };
 		DF52535115E53090002AA771 /* RtMidi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RtMidi.h; sourceTree = "<group>"; };
+		DF82663815E6381D0000CBBE /* ofxTextBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxTextBlock.cpp; path = addons/src/ofxTextBlock.cpp; sourceTree = "<group>"; };
+		DF82663915E6381D0000CBBE /* ofxTextBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTextBlock.h; path = addons/src/ofxTextBlock.h; sourceTree = "<group>"; };
+		DF82663A15E6381D0000CBBE /* ofxTextSuite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTextSuite.h; path = addons/src/ofxTextSuite.h; sourceTree = "<group>"; };
 		DF8F7B9015E24B79006A4590 /* Usert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Usert.h; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -274,6 +278,9 @@
 		DF8F7B9115E24C20006A4590 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				DF82663815E6381D0000CBBE /* ofxTextBlock.cpp */,
+				DF82663915E6381D0000CBBE /* ofxTextBlock.h */,
+				DF82663A15E6381D0000CBBE /* ofxTextSuite.h */,
 				DF52531B15E52F69002AA771 /* ofxDirList.cpp */,
 				DF52531C15E52F69002AA771 /* ofxDirList.h */,
 				DF52531D15E52F69002AA771 /* ofxUI.h */,
@@ -484,6 +491,7 @@
 				DF52535215E53090002AA771 /* ofxRtMidiIn.cpp in Sources */,
 				DF52535315E53090002AA771 /* ofxRtMidiOut.cpp in Sources */,
 				DF52535415E53090002AA771 /* RtMidi.cpp in Sources */,
+				DF82663B15E6381D0000CBBE /* ofxTextBlock.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

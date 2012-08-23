@@ -2,4 +2,7 @@
     <midiPort>0</midiPort>
     <midiChannel>10</midiChannel>
     <midiNote>46</midiNote>
+    <noPlays>2</noPlays>
+    <tapWithSpace>1</tapWithSpace>
+    <itemDimGUI>24</itemDimGUI>
 </settings>

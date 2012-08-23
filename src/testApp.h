@@ -1,10 +1,11 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxMidi.h"
+#include "ofxTextSuite.h"
 #include "ofxUI.h"
 #include "ofxDirList.h"
 #include "Usert.h"
-#include "ofxMidi.h"
 #include <sstream>
 
 
@@ -31,17 +32,21 @@ public:
     int midiPort;
     int midiChannel;
     int midiNote;
-    string instructions;
+    int noPlays;
+    bool tapWithSpace;
+    int itemDimGUI;
+    ofxTextBlock instructions;
+    bool toggleInstructions;
+    stringstream text;   
+    
     void loadXmlSettings(string fileName);
 	
     
     //MIDI
-	void newMidiMessage(ofxMidiMessage& eventArgs);
-	
-	stringstream text;
-	
+	void newMidiMessage(ofxMidiMessage& eventArgs);		
 	ofxMidiIn midiIn;
 	ofxMidiMessage midiMessage;
+    
     
     //SOUNDS
     ofxDirList   DIR;    
@@ -49,6 +54,7 @@ public:
     int numSounds;
     string* songNames;
     int played;
+    
     
     //GUI    
     ofxUICanvas *gui1,*gui2,*gui3;
