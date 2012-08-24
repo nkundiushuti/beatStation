@@ -144,6 +144,7 @@
 		DF82663815E6381D0000CBBE /* ofxTextBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxTextBlock.cpp; path = addons/src/ofxTextBlock.cpp; sourceTree = "<group>"; };
 		DF82663915E6381D0000CBBE /* ofxTextBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTextBlock.h; path = addons/src/ofxTextBlock.h; sourceTree = "<group>"; };
 		DF82663A15E6381D0000CBBE /* ofxTextSuite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTextSuite.h; path = addons/src/ofxTextSuite.h; sourceTree = "<group>"; };
+		DF89906B15E689A60060494C /* threadedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadedObject.h; sourceTree = "<group>"; };
 		DF8F7B9015E24B79006A4590 /* Usert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Usert.h; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -375,6 +376,7 @@
 				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
 				DF8F7B9015E24B79006A4590 /* Usert.h */,
+				DF89906B15E689A60060494C /* threadedObject.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;

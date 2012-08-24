@@ -25,7 +25,7 @@
 # edit the following  vars to customize the makefile
 
 include config.make
-include $(OF_ROOT)/libs/openFrameworksCompiled/project/android/paths.make
+#include $(OF_ROOT)/libs/openFrameworksCompiled/project/android/paths.make
 
 ifeq ($(findstring Android,$(MAKECMDGOALS)),Android)
 	ARCH = android

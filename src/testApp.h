@@ -5,6 +5,7 @@
 #include "ofxTextSuite.h"
 #include "ofxUI.h"
 #include "ofxDirList.h"
+#include "threadedObject.h"
 #include "Usert.h"
 #include <sstream>
 
@@ -35,8 +36,9 @@ public:
     int noPlays;
     bool tapWithSpace;
     int itemDimGUI;
-    ofxTextBlock instructions;
-    bool toggleInstructions;
+    string instrGUI1, instrGUI2;
+    ofxTextBlock instructions1,instructions2;    
+    bool toggleInstructions1,toggleInstructions2;
     stringstream text;   
     
     void loadXmlSettings(string fileName);
@@ -85,9 +87,10 @@ public:
     int checkUser(string initials);
     int getUserID(string uName);
     void array_union(int* arr, string* sarr, int n);
-    void randomOrder(int uid);
+    void randomOrder(int uid);  
     
+    //MATLAB
+    threadedObject	matlabScript;
       
-    
 
 };

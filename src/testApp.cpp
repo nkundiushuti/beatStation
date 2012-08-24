@@ -51,8 +51,7 @@ void testApp::setup() {
     
     //GUI USER
     gui1 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)    
-    gui1->addWidgetDown(new ofxUILabel("IF YOU ARE A NEW USER, ENTER YOUR INITIALS", OFX_UI_FONT_MEDIUM));   
-     gui1->addWidgetDown(new ofxUILabel("IF YOU ARE ALREADY REGISTERED, CLICK ON EXISTING AND ENTER YOUR ID", OFX_UI_FONT_MEDIUM)); 
+    gui1->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
     gui1->addSpacer(length-xInit, 2); 
     
     
@@ -79,7 +78,7 @@ void testApp::setup() {
     //GUI TEST
     gui2 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
     gui2->disable();      
-    gui2->addWidgetDown(new ofxUILabel("PLAY SOUND AND TAP ALONG", OFX_UI_FONT_LARGE)); 
+    //gui2->addWidgetDown(new ofxUILabel("PLAY SOUND AND TAP ALONG", OFX_UI_FONT_LARGE)); 
     gui2->addWidgetEastOf(new ofxUILabel("ID", OFX_UI_FONT_LARGE),"PLAY SOUND AND TAP ALONG"); 
     gui2->addSpacer(length-xInit, 2); 
     
@@ -117,12 +116,21 @@ void testApp::setup() {
     
     
     //LOAD INSTRUCTIONS
-    toggleInstructions = FALSE;
+    toggleInstructions1 = TRUE;
+    toggleInstructions2 = FALSE;
     ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
-    instructions.init("GUI/NewMedia Fett.ttf", 12);
-    instructions.setText(buffer.getText());
-    instructions.wrapTextX(length);     
-    instructions.setColor(240, 240, 240, 180);
+    if (buffer.size()>0) instrGUI2 = buffer.getText();
+    else instrGUI2 = "";
+    instrGUI1 = "If you are a new user, enter your initials then click START.\n If you are already registered click on EXISTING and enter your ID, then click START.";
+    instructions1.init("GUI/NewMedia Fett.ttf", 12);
+    instructions1.setText(instrGUI1);
+    instructions1.wrapTextX(length);     
+    instructions1.setColor(240, 240, 240, 180);
+    instructions2.init("GUI/NewMedia Fett.ttf", 12);
+    instructions2.setText(instrGUI2);
+    instructions2.wrapTextX(length);     
+    instructions2.setColor(240, 240, 240, 180);
+    
 }
 
 //--------------------------------------------------------------
@@ -144,6 +152,8 @@ void testApp::update() {
     
     ofxUISlider *volume = (ofxUISlider *) gui2->getWidget("VOL");
     beats.setVolume(volume->getValue());
+    
+    // (matlabScript.isThreadRunning()) cout << "_"; 
 }
 
 //--------------------------------------------------------------
@@ -153,19 +163,29 @@ void testApp::draw() {
     // update the sound playing system:
 	ofSoundUpdate();	
     
-    if (toggleInstructions)
+    if (toggleInstructions1)
     {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
-        ofxUIButton *button = (ofxUIButton *) gui2->getWidget("INSTRUCTIONS");
-        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect(); 
-        instructions.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
+        ofxUIButton *button1 = (ofxUIButton *) gui1->getWidget("START");
+        ofxUIRectangle *rect1 = (ofxUIRectangle *) button1->getRect();  
+        instructions1.drawLeft(rect1->getX(), rect1->getY() + rect1->getHeight() + button1->getPadding());
     }
+    
+    if (toggleInstructions2)
+    {
+        //draw instructions
+        //instructions.drawJustified(0, 0, instructions.getWidth());
+        ofxUIButton *button2 = (ofxUIButton *) gui2->getWidget("INSTRUCTIONS");
+        ofxUIRectangle *rect2 = (ofxUIRectangle *) button2->getRect(); 
+        instructions2.drawLeft(rect2->getX(), rect2->getY() + rect2->getHeight() + button2->getPadding());
+    }
+    
 }
 
 //--------------------------------------------------------------
 void testApp::exit() {
-    
+    matlabScript.stop();
     
     delete gui1;
     delete gui2;
@@ -705,7 +725,8 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
             songN->setLabel(label2);
             
             //LOAD THE TAPPING GUI
-            toggleInstructions = TRUE;
+            toggleInstructions1 = FALSE;
+            toggleInstructions2 = TRUE;
             errors->setVisible(FALSE);            
             gui1->disable();
             gui2->enable();
@@ -713,7 +734,7 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
             ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
             rotary->setValue(0.0);        
             ofxUISlider *volume = (ofxUISlider *) gui2->getWidget("VOL");
-            beats.setVolume(75);
+            volume->setValue(75);
         }
     }  
     
@@ -742,7 +763,9 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
     //play a song
 	if ((e.widget->getName() == "PLAY") && (button->getValue()==1))	
     {         
-        if ((!beats.getIsPlaying()) && (played<(noPlays+1))) {
+        if (!beats.isLoaded()) { cout << "sound failed to load" << endl; }
+        else if ((!beats.getIsPlaying()) && (played<(noPlays+1))) 
+        {
             //update playing widget
             ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
             rotary->setValue(0.0);
@@ -767,7 +790,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             saveXmlTap(text.str());                       
             
             //load gui
-            toggleInstructions = FALSE;
+            toggleInstructions1 = FALSE;
             gui2->disable();
             gui3->enable();
             button->setValue(FALSE);
@@ -776,7 +799,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         {       
             usert.currentSound++;
             
-            if (usert.currentSound > 0) toggleInstructions = FALSE;
+            if (usert.currentSound > 0) toggleInstructions1 = FALSE;
             
             //load the next sound     
             beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);            
@@ -817,20 +840,31 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         usert.deleteTranscription();
         
         //load the gui1     
-        toggleInstructions = FALSE;
+        toggleInstructions1 = TRUE;
+        toggleInstructions2 = FALSE;
         button->setValue(FALSE);
         ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
         radio->activateToggle("NEW"); 
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget("INITIALS");
         label->setLabel("INITIALS");
         gui2->disable();
-        gui1->enable();         
+        gui1->enable();  
+        
+        //if (matlabScript.isThreadRunning()) matlabScript.stop();
+        //cout << "QUIT" << endl;
     }
     
     if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))	
     { 
+         if (!matlabScript.isThreadRunning())
+         {
+             matlabScript.path = "/Users/mmiron/Documents/INESC/marsyas-0.4.5/build/bin/ibt";
+             // matlabScript.start();
+         }
+        
         //show/hide the instructions
-        toggleInstructions = !toggleInstructions;
+        toggleInstructions2 = !toggleInstructions2;
+        
     }
     
 }
@@ -854,7 +888,8 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
         //loadXmlUser("data/users.xml");              
         
         //load the gui1     
-        toggleInstructions = FALSE;
+        toggleInstructions1 = TRUE;
+        toggleInstructions2 = FALSE;
         button->setValue(FALSE);
         ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
         radio->activateToggle("NEW"); 

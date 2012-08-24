@@ -1,2 +1,5 @@
 ofxMidi
-
+ofxUI
+ofxXMLSettings
+ofxDirList
+ofxTextSuite
