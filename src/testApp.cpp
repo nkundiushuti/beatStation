@@ -6,11 +6,12 @@ void testApp::setup() {
 	//ofBackground(255, 255, 255);
 	//ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetEscapeQuitsApp(FALSE);
-    
+    ofSetFullscreen(1);  
+        
     
     //LOAD SETTINGS
     loadXmlSettings("settings.xml");    
-    
+      
         
     //LOAD USERS 
     nrUsers = 0;
@@ -18,13 +19,8 @@ void testApp::setup() {
     loadXmlUser("data/users.xml");     
     //usert.initTranscription(numSounds);
     usert.setName("");
-    usert.setID(-1);
-    
-    
-    //things to be done when the application is launched
-    ofSetFullscreen(1);  
-    clickTime = ofGetElapsedTimef();
-    
+    usert.setID(-1);  
+        
     
     //LOAD SOUNDS
     //DIR.setVerbose(false);
@@ -35,25 +31,41 @@ void testApp::setup() {
     }  
     
     
-    ///////MIDI	
+    ///////MIDI	INTERFACE
 	midiIn.openPort(midiPort);
 	//midiIn.openPort("IAC Pure Data In");	// by name
 	midiIn.ignoreTypes(false, false, false);
-    midiIn.addListener((ofxMidiListener *)this);	
+    midiIn.addListener((ofxMidiListener *)this);       
     
-    
-    /////////// INITIALIZE GUI 
+    /////////// INITIALIZE GUI SETTINGS
     float dim = itemDimGUI; 
     float xInit = OFX_UI_GLOBAL_WIDGET_SPACING; 
     float length = ofGetHeight()-xInit;
     vector<string> names; 
     
     
+    //LOAD INSTRUCTIONS
+    toggleInstructions1 = TRUE;
+    toggleInstructions2 = FALSE;
+    toggleInstructions3 = FALSE;
+    ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
+    if (buffer.size()>0) instrGUI2 = buffer.getText();
+    else instrGUI2 = "";
+    instrGUI1 = "If you are a new user, enter your initials then click START.\n If you are already registered click on EXISTING and enter your ID, then click START.";
+    instructions1.init("GUI/NewMedia Fett.ttf", 12);
+    instructions1.setText(instrGUI1);
+    instructions1.wrapTextX(length);     
+    instructions1.setColor(240, 240, 240, 180);
+    instructions2.init("GUI/NewMedia Fett.ttf", 12);
+    instructions2.setText(instrGUI2);
+    instructions2.wrapTextX(length);     
+    instructions2.setColor(240, 240, 240, 180);
+     
+    
     //GUI USER
     gui1 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)    
     gui1->addWidgetDown(new ofxUILabel("BEAT STATION", OFX_UI_FONT_LARGE));
-    gui1->addSpacer(length-xInit, 2); 
-    
+    gui1->addSpacer(length-xInit, 2);     
     
     vector<string> vnames; vnames.push_back("NEW"); vnames.push_back("EXISTING"); 
     ofxUIRadio *radio = (ofxUIRadio *) gui1->addWidgetDown(new ofxUIRadio("USER", vnames, OFX_UI_ORIENTATION_VERTICAL, dim, dim )); 
@@ -68,70 +80,62 @@ void testApp::setup() {
     gui1->addWidgetSouthOf(new ofxUITextInput("ID", "", (length-xInit)/4),"INITIALS");
     ofxUILabel *errors = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_MEDIUM);
     errors->setVisible(FALSE);
-    gui1->addWidgetEastOf(errors,"START"); 
-    
+    gui1->addWidgetEastOf(errors,"START");     
     //gui1->centerWidgets();
     gui1->setDrawBack(false);
-    //gui1->disable(); 
+    //gui1->disable();     
+    
+
+    //GUI PRE-TEST
+    gui2 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
+    gui2->disable();      
+    gui2->addWidgetDown(new ofxUILabel("INSTRUCTIONS", OFX_UI_FONT_LARGE)); 
+    gui2->addSpacer(length-xInit, 2); 
+    gui2->addWidgetDown(new ofxUILabel("ID", OFX_UI_FONT_MEDIUM));
+    gui2->setDrawBack(false);
+    ofxUISpacer* spacer = new ofxUISpacer(ofGetWidth()-length, instructions2.getHeight(), "SPACER");
+    spacer->setVisible(FALSE);
+    gui2->addWidgetDown(spacer);
+    gui2->addWidgetDown(new ofxUIButton("START",false, dim*2, dim*2, OFX_UI_FONT_MEDIUM));
+    ofAddListener(gui2->newGUIEvent, this, &testApp::guiEvent2); 
     
     
     //GUI TEST
-    gui2 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
-    gui2->disable();      
-    //gui2->addWidgetDown(new ofxUILabel("PLAY SOUND AND TAP ALONG", OFX_UI_FONT_LARGE)); 
-    gui2->addWidgetEastOf(new ofxUILabel("ID", OFX_UI_FONT_LARGE),"PLAY SOUND AND TAP ALONG"); 
-    gui2->addSpacer(length-xInit, 2); 
-    
-    gui2->addWidgetDown(new ofxUIButton("PLAY",false, dim*2, dim*2));
-    gui2->addWidgetDown(new ofxUIButton("NEXT",false, dim*2, dim*2));
-    
-    gui2->addSpacer(length-xInit, 2);  
-    
-    gui2->addWidgetDown(new ofxUIButton("INSTRUCTIONS",false, dim*2, dim*2));
-    //gui2->addSpacer(length-xInit, 2);  
-    gui2->addWidgetEastOf(new ofxUIButton("QUIT",false, dim*2, dim*2),"INSTRUCTIONS");
-    
-    
-    
-    gui2->addWidgetEastOf(new ofxUILabel("SONG ID", OFX_UI_FONT_MEDIUM),"PLAY");
-    gui2->addWidgetSouthOf(new ofxUIRotarySlider(dim*3, 0, 100, 0.0, "POS"),"SONG ID");
-    gui2->addWidgetEastOf(new ofxUISlider("VOL", 0.0, 99.0, 75.0, dim, dim * 3),"POS");
-    
-    
-    ofAddListener(gui2->newGUIEvent, this, &testApp::guiEvent2); 
-    //gui2->centerWidgets();
-    gui2->setDrawBack(false);
-    
-    
-    //GUI RESULTS
     gui3 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
-    gui3->disable(); 
-    gui3->addWidgetDown(new ofxUILabel("THANK YOU!", OFX_UI_FONT_LARGE)); 
+    gui3->disable();      
+    gui3->addWidgetDown(new ofxUILabel("ID", OFX_UI_FONT_LARGE)); 
     gui3->addSpacer(length-xInit, 2); 
     
-    gui3->addWidgetDown(new ofxUIButton("FINISH",false, dim*2, dim*2)); 
-    ofAddListener(gui3->newGUIEvent, this, &testApp::guiEvent3);     
+    gui3->addWidgetDown(new ofxUIButton("PLAY",false, dim*2, dim*2));
+    gui3->addWidgetDown(new ofxUIButton("NEXT",false, dim*2, dim*2));
+    
+    gui3->addSpacer(length-xInit, 2);  
+    
+    gui3->addWidgetDown(new ofxUIButton("INSTRUCTIONS",false, dim*2, dim*2));
+    //gui3->addSpacer(length-xInit, 2);  
+    gui3->addWidgetEastOf(new ofxUIButton("QUIT",false, dim*2, dim*2),"INSTRUCTIONS");    
+    
+    gui3->addWidgetEastOf(new ofxUILabel("SONG ID", OFX_UI_FONT_MEDIUM),"PLAY");
+    gui3->addWidgetSouthOf(new ofxUIRotarySlider(dim*3, 0, 100, 0.0, "POS"),"SONG ID");
+    gui3->addWidgetEastOf(new ofxUISlider("VOL", 0.0, 99.0, 75.0, dim, dim * 3),"POS");   
+    
+    ofAddListener(gui3->newGUIEvent, this, &testApp::guiEvent3); 
+    //gui3->centerWidgets();
     gui3->setDrawBack(false);
     
     
+    //GUI RESULTS
+    gui4 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());
+    gui4->disable(); 
+    gui4->addWidgetDown(new ofxUILabel("THANK YOU!", OFX_UI_FONT_LARGE)); 
+    gui4->addSpacer(length-xInit, 2); 
     
-    //LOAD INSTRUCTIONS
-    toggleInstructions1 = TRUE;
-    toggleInstructions2 = FALSE;
-    ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
-    if (buffer.size()>0) instrGUI2 = buffer.getText();
-    else instrGUI2 = "";
-    instrGUI1 = "If you are a new user, enter your initials then click START.\n If you are already registered click on EXISTING and enter your ID, then click START.";
-    instructions1.init("GUI/NewMedia Fett.ttf", 12);
-    instructions1.setText(instrGUI1);
-    instructions1.wrapTextX(length);     
-    instructions1.setColor(240, 240, 240, 180);
-    instructions2.init("GUI/NewMedia Fett.ttf", 12);
-    instructions2.setText(instrGUI2);
-    instructions2.wrapTextX(length);     
-    instructions2.setColor(240, 240, 240, 180);
+    gui4->addWidgetDown(new ofxUIButton("FINISH",false, dim*2, dim*2)); 
+    ofAddListener(gui4->newGUIEvent, this, &testApp::guiEvent4);     
+    gui4->setDrawBack(false);   
     
 }
+
 
 //--------------------------------------------------------------
 void testApp::update() {
@@ -144,16 +148,16 @@ void testApp::update() {
         }
     
         //update playing widget
-        ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
+        ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui3->getWidget("POS");
         //if (beats.getPosition() > 0.99) rotary->setValue(100);
         //else 
             rotary->setValue(beats.getPosition()*100);
     }
     
-    ofxUISlider *volume = (ofxUISlider *) gui2->getWidget("VOL");
+    ofxUISlider *volume = (ofxUISlider *) gui3->getWidget("VOL");
     beats.setVolume(volume->getValue());
     
-    // (matlabScript.isThreadRunning()) cout << "_"; 
+    if (matlabScript.isThreadRunning()) cout << "_"; 
 }
 
 //--------------------------------------------------------------
@@ -167,18 +171,25 @@ void testApp::draw() {
     {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
-        ofxUIButton *button1 = (ofxUIButton *) gui1->getWidget("START");
-        ofxUIRectangle *rect1 = (ofxUIRectangle *) button1->getRect();  
-        instructions1.drawLeft(rect1->getX(), rect1->getY() + rect1->getHeight() + button1->getPadding());
+        ofxUIButton *button = (ofxUIButton *) gui1->getWidget("START");
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect();  
+        instructions1.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
     }
-    
     if (toggleInstructions2)
     {
         //draw instructions
         //instructions.drawJustified(0, 0, instructions.getWidth());
-        ofxUIButton *button2 = (ofxUIButton *) gui2->getWidget("INSTRUCTIONS");
-        ofxUIRectangle *rect2 = (ofxUIRectangle *) button2->getRect(); 
-        instructions2.drawLeft(rect2->getX(), rect2->getY() + rect2->getHeight() + button2->getPadding());
+        ofxUIButton *button = (ofxUIButton *) gui2->getWidget("ID");
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect(); 
+        instructions2.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
+    }
+    if (toggleInstructions3)
+    {
+        //draw instructions
+        //instructions.drawJustified(0, 0, instructions.getWidth());
+        ofxUIButton *button = (ofxUIButton *) gui3->getWidget("INSTRUCTIONS");
+        ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect(); 
+        instructions2.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
     }
     
 }
@@ -188,8 +199,8 @@ void testApp::exit() {
     matlabScript.stop();
     
     delete gui1;
-    delete gui2;
-	delete gui3;
+    delete gui3;
+	delete gui4;
     delete[] uIDs;
     delete[] uNames;
     
@@ -602,12 +613,7 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
     
     //START TEST
 	if ((wname == "START") && (button->getValue()==1))	
-    {           
-        bool forward=TRUE;
-        
-        //prevent starting if clicked right away - solved a bug of button class
-        //if ( (ofGetElapsedTimef() - clickTime ) < 1)  {clickTime = ofGetElapsedTimef(); return;}   
-        
+    {       
         ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
         
         //GATHER USER DATA AND CHECK IT
@@ -618,127 +624,93 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
         //check for errors 
         
         //check log-in errors, refresh the data
-        if (forward)
-        {
+       
             //load and refresh the xml data
             loadXmlUser("data/users.xml"); 
             
-            if (newUser) 
+        if (newUser) 
+        {
+            //cout << "NEW USER" << endl;
+            //check semantic errors
+            if ( (name.length() != 2) || (name == "  ") )
             {
-                //cout << "NEW USER" << endl;
-                //check semantic errors
-                if ( (name.length() != 2) || (name == "  ") )
-                {
-                    errors->setLabel("ERROR! PLEASE INTRODUCE YOUR INITIALS AGAIN");
-                    errors->setVisible(TRUE);
-                    forward = FALSE;
-                }
-                else
-                {                    
-                    //get the max id with the existing user with same initials
-                    int code = checkUser(name);
-                
-                    //assign an ID to the new user, the maximum ID + 1 
-                    uIDs[nrUsers] = maxID+1;
-                    text.clear();text.str("");
-                    text << name << code;
-                    uNames[nrUsers] = text.str();
-                    usert.setID(maxID+1);
-                    usert.setName(text.str()); 
-                
-                    //save the new user
-                    saveXmlUser("data/users.xml");
-                
-                    //init transcription
-                    //usert.deleteTranscription();
-                    usert.initTranscription(numSounds);  
-                    usert.currentSound = 0;
-                    randomOrder(usert.getID());   
-                    
-                }
+                errors->setLabel("ERROR! PLEASE INTRODUCE YOUR INITIALS AGAIN");
+                errors->setVisible(TRUE);
             }
             else
-            {                
-                //check semantic errors
-                if ( (name.length() < 3) || (name.substr(0,1) == " ") )
-                {
-                    errors->setLabel("ERROR! PLEASE INTRODUCE YOUR ID AGAIN");
-                    errors->setVisible(TRUE);
-                    forward = FALSE;
-                }
-                else
-                {
-                    //get the max id with the existing user with same initials
-                    int code = getUserID(name);
-                    if (code == -1) 
-                    {
-                        errors->setLabel("ERROR! THE USER WITH THIS ID DOESN'T EXIST IN THE DATABASE");
-                        errors->setVisible(TRUE);
-                        forward = FALSE;
-                    }
-                    else 
-                    {
-                        usert.setID(code);
-                        usert.setName(name); 
-                        //load transcription
-                        //usert.deleteTranscription();
-                        usert.initTranscription(numSounds);  
-                        text.clear();text.str("");
-                        text << "data/" << name << ".xml";
-                        loadXmlTap(text.str());                   
-                        randomOrder(usert.getID());
-                    }
-                }
+            {                    
+                //get the max id with the existing user with same initials
+                int code = checkUser(name);
+            
+                //assign an ID to the new user, the maximum ID + 1 
+                uIDs[nrUsers] = maxID+1;
+                text.clear();text.str("");
+                text << name << code;
+                uNames[nrUsers] = text.str();
+                usert.setID(maxID+1);
+                usert.setName(text.str()); 
+            
+                //save the new user
+                saveXmlUser("data/users.xml");
+            
+                //init transcription
+                //usert.deleteTranscription();
+                usert.initTranscription(numSounds);  
+                usert.currentSound = 0;
+                randomOrder(usert.getID());   
+                
+                
+                //SHOW THE INSTRUCTIONS GUI
+                //user
+                text.clear();text.str("");
+                text << "TAPPER ID: " << usert.getName() << " ";
+                ofxUILabel *userL = (ofxUILabel *) gui2->getWidget("ID");
+                userL->setLabel(text.str());
+                toggleInstructions1 = FALSE;
+                toggleInstructions2 = TRUE;
+                gui1->disable();
+                gui2->enable();
                 
             }
-        }            
-        
-        
-        //if the user tapped everything before we just present him the results
-        if (usert.currentSound >= numSounds)
-        {           
-            //load gui
-            gui1->disable();
-            gui3->enable();
-            forward = FALSE;              
         }
-        //MOVE FORWARD TO THE TAPPING        
-        if (forward)
+        else
         {                
-            //LOAD THE FIRST SOUND
-            beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);
-            beats.setMultiPlay(false); 
-            beats.setVolume(75);
-                        
-            //ADD WIDGETS
-            //user
-            text.clear();text.str("");
-            text << "ID: " << usert.getName() << " ";
-            ofxUILabel *userL = (ofxUILabel *) gui2->getWidget("ID");
-            userL->setLabel(text.str());
+            //check semantic errors
+            if ( (name.length() < 3) || (name.substr(0,1) == " ") )
+            {
+                errors->setLabel("ERROR! PLEASE INTRODUCE YOUR ID AGAIN");
+                errors->setVisible(TRUE);
+            }
+            else
+            {
+                //get the max id with the existing user with same initials
+                int code = getUserID(name);
+                if (code == -1) 
+                {
+                    errors->setLabel("ERROR! THE USER WITH THIS ID DOESN'T EXIST IN THE DATABASE");
+                    errors->setVisible(TRUE);
+                }
+                else 
+                {
+                    usert.setID(code);
+                    usert.setName(name); 
+                    //load transcription
+                    //usert.deleteTranscription();
+                    usert.initTranscription(numSounds);  
+                    text.clear();text.str("");
+                    text << "data/" << name << ".xml";
+                    loadXmlTap(text.str());                   
+                    randomOrder(usert.getID());
+                    
+                    //LOAD TAPPING INTERFACE
+                    loadTapping(0);
+                }
+            }
             
-            //song nr
-            char numstr[21]; // enough to hold all numbers up to 64-bits
-            sprintf(numstr, "%d", usert.currentSound+1);
-            string label1 = "SONG ID: ", label2 = label1 + numstr;
-            ofxUILabel *songN = (ofxUILabel *) gui2->getWidget("SONG ID");
-            songN->setLabel(label2);
-            
-            //LOAD THE TAPPING GUI
-            toggleInstructions1 = FALSE;
-            toggleInstructions2 = TRUE;
-            errors->setVisible(FALSE);            
-            gui1->disable();
-            gui2->enable();
-            button->setValue(FALSE);
-            ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
-            rotary->setValue(0.0);        
-            ofxUISlider *volume = (ofxUISlider *) gui2->getWidget("VOL");
-            volume->setValue(75);
         }
     }  
     
-    //change new/existing user
+    //CHANGE NEW/EXISTING
     else if(wkind == OFX_UI_WIDGET_TOGGLE)
     {
         ofxUIToggle *toggle = (ofxUIToggle *) e.widget; 
@@ -755,8 +727,22 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
     
 }
 
-
 void testApp::guiEvent2(ofxUIEventArgs &e)
+{
+    int wkind = e.widget->getKind(); 
+    string wname = e.widget->getName();
+    ofxUIButton *button = (ofxUIButton *) e.widget;    
+    
+    //START TEST
+	if ((wname == "START") && (button->getValue()==1))	
+    {  
+        //LOAD TAPPING INTERFACE
+        loadTapping(1);        
+    }
+}
+
+
+void testApp::guiEvent3(ofxUIEventArgs &e)
 {  
     ofxUIButton *button = (ofxUIButton *) e.widget;
     
@@ -767,7 +753,7 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         else if ((!beats.getIsPlaying()) && (played<(noPlays+1))) 
         {
             //update playing widget
-            ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
+            ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui3->getWidget("POS");
             rotary->setValue(0.0);
             
             //clear transcription vector for the current sound
@@ -791,8 +777,8 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             
             //load gui
             toggleInstructions1 = FALSE;
-            gui2->disable();
-            gui3->enable();
+            gui3->disable();
+            gui4->enable();
             button->setValue(FALSE);
         }
         else if (played>0) //move to the next sound if the current sound has been played
@@ -810,11 +796,11 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
             char numstr[21]; // enough to hold all numbers up to 64-bits
             sprintf(numstr, "%d", usert.currentSound+1);
             string label1 = "SONG ID: ", label2 = label1 + numstr;
-            ofxUILabel *songN = (ofxUILabel *) gui2->getWidget("SONG ID");
+            ofxUILabel *songN = (ofxUILabel *) gui3->getWidget("SONG ID");
             songN->setLabel(label2);
             
             //update playing widget at zero
-            ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui2->getWidget("POS");
+            ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui3->getWidget("POS");
             rotary->setValue(0.0);
             
         }        
@@ -841,17 +827,16 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
         
         //load the gui1     
         toggleInstructions1 = TRUE;
-        toggleInstructions2 = FALSE;
+        toggleInstructions3 = FALSE;
         button->setValue(FALSE);
         ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
         radio->activateToggle("NEW"); 
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget("INITIALS");
         label->setLabel("INITIALS");
-        gui2->disable();
+        gui3->disable();
         gui1->enable();  
         
-        //if (matlabScript.isThreadRunning()) matlabScript.stop();
-        //cout << "QUIT" << endl;
+        if (matlabScript.isThreadRunning()) matlabScript.stop();
     }
     
     if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))	
@@ -859,18 +844,18 @@ void testApp::guiEvent2(ofxUIEventArgs &e)
          if (!matlabScript.isThreadRunning())
          {
              matlabScript.path = "/Users/mmiron/Documents/INESC/marsyas-0.4.5/build/bin/ibt";
-             // matlabScript.start();
+             matlabScript.start();
          }
         
         //show/hide the instructions
-        toggleInstructions2 = !toggleInstructions2;
+        toggleInstructions3 = !toggleInstructions3;
         
     }
     
 }
 
 
-void testApp::guiEvent3(ofxUIEventArgs &e)
+void testApp::guiEvent4(ofxUIEventArgs &e)
 {    
     ofxUIButton *button = (ofxUIButton *) e.widget;    
     
@@ -889,21 +874,76 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
         
         //load the gui1     
         toggleInstructions1 = TRUE;
-        toggleInstructions2 = FALSE;
+        toggleInstructions3 = FALSE;
         button->setValue(FALSE);
         ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
         radio->activateToggle("NEW"); 
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget("INITIALS");
         label->setLabel("INITIALS");
-        gui3->disable();
+        gui4->disable();
         gui1->enable();  
-        
-        
-        
-        //prevent starting if clicked right away - solved a bug of button class
-        //if ( (ofGetElapsedTimef() - clickTime ) < 1)  {clickTime = ofGetElapsedTimef(); return;}   
     }
     
+}
+
+void testApp::loadTapping(int stage)
+{
+    //if the user tapped everything before we just present him the results
+    if (usert.currentSound >= numSounds)
+    {           
+        //load gui
+        gui1->disable();
+        gui4->enable();
+        toggleInstructions1 = FALSE;
+        toggleInstructions2 = FALSE;
+        toggleInstructions3 = FALSE;
+    }
+    else {
+    //LOAD THE FIRST SOUND
+    beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);
+    beats.setMultiPlay(false); 
+    beats.setVolume(75);
+    
+    //ADD WIDGETS
+    //user
+    text.clear();text.str("");
+    text << "TAPPER ID: " << usert.getName() << " ";
+    ofxUILabel *userL = (ofxUILabel *) gui3->getWidget("ID");
+    userL->setLabel(text.str());
+    
+    //song nr
+    text.clear();text.str("");
+    text << "SONG ID: " << usert.currentSound+1 << " ";
+    ofxUILabel *songN = (ofxUILabel *) gui3->getWidget("SONG ID");
+    songN->setLabel(text.str());
+    
+    //LOAD THE TAPPING GUI
+    toggleInstructions1 = FALSE;
+    
+    ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
+    errors->setVisible(FALSE);            
+
+    //ofxUIButton *button = (ofxUIButton *) e.widget;
+    //button->setValue(FALSE);
+    ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui3->getWidget("POS");
+    rotary->setValue(0.0);        
+    ofxUISlider *volume = (ofxUISlider *) gui3->getWidget("VOL");
+    volume->setValue(75);
+        
+    //load the gui
+    if (stage==0)   
+    {
+        gui1->disable();        
+    }
+    else 
+    {        
+        gui2->disable();         
+    }
+    toggleInstructions1 = FALSE;
+    toggleInstructions2 = FALSE;
+    toggleInstructions3 = FALSE;
+    gui3->enable(); 
+    }
 }
 
 

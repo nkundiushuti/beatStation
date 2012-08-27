@@ -5,4 +5,5 @@
     <noPlays>2</noPlays>
     <tapWithSpace>1</tapWithSpace>
     <itemDimGUI>24</itemDimGUI>
+    <appToLaunchPath>matlab</appToLaunchPath>
 </settings>

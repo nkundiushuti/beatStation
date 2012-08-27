@@ -1,1 +1,4 @@
-You can now click the PLAY button to listen the song and start tapping on the midi interface. Then click NEXT to move to the next song. You can repeat the tapping by listening to the song a second time. If you feel that the volume is too loud or too quiet, you can adjust it from the VOL slider. A song has terminated when the audio stops or when the POS slider reaches 100.
+Welcome to the Beat Station. 
+You will be presented a set of music examples and you would have to tap on the midi interface, following the beat. You can click the PLAY button to listen the song. Then click NEXT to move to the next song. You can repeat the tapping by listening to the song a second time. 
+If you feel that the volume is too loud or too quiet, you can adjust it from the VOL slider. A song has terminated when the audio stops or when the POS slider reaches 100. 
+Please remember your id if you plan to tap in different sessions. 

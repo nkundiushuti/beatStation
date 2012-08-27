@@ -38,7 +38,7 @@ public:
     int itemDimGUI;
     string instrGUI1, instrGUI2;
     ofxTextBlock instructions1,instructions2;    
-    bool toggleInstructions1,toggleInstructions2;
+    bool toggleInstructions1,toggleInstructions2,toggleInstructions3;
     stringstream text;   
     
     void loadXmlSettings(string fileName);
@@ -59,11 +59,13 @@ public:
     
     
     //GUI    
-    ofxUICanvas *gui1,*gui2,*gui3;
+    ofxUICanvas *gui1,*gui2,*gui3, *gui4;
     
     void guiEvent1(ofxUIEventArgs &e);
     void guiEvent2(ofxUIEventArgs &e);
-    void guiEvent3(ofxUIEventArgs &e);    
+    void guiEvent3(ofxUIEventArgs &e); 
+    void guiEvent4(ofxUIEventArgs &e); 
+    void loadTapping(int stage);
     
     
     //USER
@@ -77,7 +79,6 @@ public:
     bool newUser;
     int nrUsers;
     int maxID;
-    int clickTime;
     
     void saveXmlUser(string fileName);        
     void loadXmlUser(string fileName);

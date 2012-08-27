@@ -19,15 +19,15 @@
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
 	<key>DTCompiler</key>
-	<string></string>
+	<string>com.apple.compilers.llvmgcc42</string>
 	<key>DTPlatformBuild</key>
 	<string>4D199</string>
 	<key>DTPlatformVersion</key>
 	<string>GM</string>
 	<key>DTSDKBuild</key>
-	<string>11D50b</string>
+	<string>10K549</string>
 	<key>DTSDKName</key>
-	<string></string>
+	<string>macosx10.6</string>
 	<key>DTXcode</key>
 	<string>0420</string>
 	<key>DTXcodeBuild</key>
