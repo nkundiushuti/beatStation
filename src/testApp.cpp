@@ -48,6 +48,7 @@ void testApp::setup() {
     toggleInstructions1 = TRUE;
     toggleInstructions2 = FALSE;
     toggleInstructions3 = FALSE;
+    toggleResults = FALSE;
     ofBuffer buffer = ofBufferFromFile("instructions.txt"); // reading into the buffer
     if (buffer.size()>0) instrGUI2 = buffer.getText();
     else instrGUI2 = "";
@@ -132,7 +133,12 @@ void testApp::setup() {
     
     gui4->addWidgetDown(new ofxUIButton("FINISH",false, dim*2, dim*2)); 
     ofAddListener(gui4->newGUIEvent, this, &testApp::guiEvent4);     
-    gui4->setDrawBack(false);   
+    gui4->setDrawBack(false);  
+    if (launchScript) 
+    {
+        gui4->addWidgetDown(new ofxUILabel("RESULTS", OFX_UI_FONT_MEDIUM));        
+        results.init("GUI/NewMedia Fett.ttf", 12);
+    }
     
 }
 
@@ -157,7 +163,7 @@ void testApp::update() {
     ofxUISlider *volume = (ofxUISlider *) gui3->getWidget("VOL");
     beats.setVolume(volume->getValue());
     
-    if (matlabScript.isThreadRunning()) cout << "_"; 
+    if (launchScript) matlabScript.waitForThread();
 }
 
 //--------------------------------------------------------------
@@ -191,6 +197,14 @@ void testApp::draw() {
         ofxUIRectangle *rect = (ofxUIRectangle *) button->getRect(); 
         instructions2.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + button->getPadding());
     }
+    if ((launchScript) && (toggleResults))
+    {
+        //draw instructions
+        //instructions.drawJustified(0, 0, instructions.getWidth());
+        ofxUILabel *label = (ofxUILabel *) gui4->getWidget("RESULTS");
+        ofxUIRectangle *rect = (ofxUIRectangle *) label->getRect(); 
+        results.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + label->getPadding());
+    }    
     
 }
 
@@ -282,6 +296,10 @@ void testApp::loadXmlSettings(string fileName)
             if (xmlSet.getValue("tapWithSpace", 1)) tapWithSpace = TRUE;
             else tapWithSpace = FALSE;
             itemDimGUI = xmlSet.getValue("itemDimGUI", 24);
+            if (xmlSet.getValue("launchScript", 1)) launchScript = TRUE;
+            else launchScript = FALSE;
+            scriptDirectory =  xmlSet.getValue("scriptDirectory", "");
+            appToLaunchPath =  xmlSet.getValue("appToLaunchPath", "");
                     
             xmlSet.popTag();  
         }
@@ -292,6 +310,9 @@ void testApp::loadXmlSettings(string fileName)
             noPlays = 2;
             tapWithSpace = TRUE;
             itemDimGUI = 24;
+            appToLaunchPath = "";
+            launchScript = FALSE;
+            scriptDirectory = "";
         }
     }
     else {
@@ -301,6 +322,7 @@ void testApp::loadXmlSettings(string fileName)
         noPlays = 2;
         tapWithSpace = TRUE;
         itemDimGUI = 24;
+        appToLaunchPath = "";
     }
     
 }
@@ -630,7 +652,6 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
             
         if (newUser) 
         {
-            //cout << "NEW USER" << endl;
             //check semantic errors
             if ( (name.length() != 2) || (name == "  ") )
             {
@@ -673,7 +694,7 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
                 
             }
         }
-        else
+        else //existing user
         {                
             //check semantic errors
             if ( (name.length() < 3) || (name.substr(0,1) == " ") )
@@ -773,7 +794,15 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
             //save the tapping to xml
             text.clear();text.str("");
             text << "data/" << usert.getName() << ".xml";
-            saveXmlTap(text.str());                       
+            saveXmlTap(text.str());   
+            
+            //compute and load results
+            if (launchScript) 
+            {
+                callScript();
+                loadXmlResults();
+                toggleResults = TRUE;
+            }
             
             //load gui
             toggleInstructions1 = FALSE;
@@ -840,13 +869,7 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
     }
     
     if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))	
-    { 
-         if (!matlabScript.isThreadRunning())
-         {
-             matlabScript.path = "/Users/mmiron/Documents/INESC/marsyas-0.4.5/build/bin/ibt";
-             matlabScript.start();
-         }
-        
+    {     
         //show/hide the instructions
         toggleInstructions3 = !toggleInstructions3;
         
@@ -898,53 +921,81 @@ void testApp::loadTapping(int stage)
         toggleInstructions2 = FALSE;
         toggleInstructions3 = FALSE;
     }
-    else {
-    //LOAD THE FIRST SOUND
-    beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);
-    beats.setMultiPlay(false); 
-    beats.setVolume(75);
-    
-    //ADD WIDGETS
-    //user
-    text.clear();text.str("");
-    text << "TAPPER ID: " << usert.getName() << " ";
-    ofxUILabel *userL = (ofxUILabel *) gui3->getWidget("ID");
-    userL->setLabel(text.str());
-    
-    //song nr
-    text.clear();text.str("");
-    text << "SONG ID: " << usert.currentSound+1 << " ";
-    ofxUILabel *songN = (ofxUILabel *) gui3->getWidget("SONG ID");
-    songN->setLabel(text.str());
-    
-    //LOAD THE TAPPING GUI
-    toggleInstructions1 = FALSE;
-    
-    ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
-    errors->setVisible(FALSE);            
-
-    //ofxUIButton *button = (ofxUIButton *) e.widget;
-    //button->setValue(FALSE);
-    ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui3->getWidget("POS");
-    rotary->setValue(0.0);        
-    ofxUISlider *volume = (ofxUISlider *) gui3->getWidget("VOL");
-    volume->setValue(75);
-        
-    //load the gui
-    if (stage==0)   
-    {
-        gui1->disable();        
-    }
     else 
-    {        
-        gui2->disable();         
-    }
-    toggleInstructions1 = FALSE;
-    toggleInstructions2 = FALSE;
-    toggleInstructions3 = FALSE;
-    gui3->enable(); 
+    {
+        //LOAD THE FIRST SOUND
+        beats.loadSound(songNames[usert.sounds[usert.currentSound].songID]);
+        beats.setMultiPlay(false); 
+        beats.setVolume(75);
+        
+        //ADD WIDGETS
+        //user
+        text.clear();text.str("");
+        text << "TAPPER ID: " << usert.getName() << " ";
+        ofxUILabel *userL = (ofxUILabel *) gui3->getWidget("ID");
+        userL->setLabel(text.str());
+        
+        //song nr
+        text.clear();text.str("");
+        text << "SONG ID: " << usert.currentSound+1 << " ";
+        ofxUILabel *songN = (ofxUILabel *) gui3->getWidget("SONG ID");
+        songN->setLabel(text.str());
+        
+        //LOAD THE TAPPING GUI
+        toggleInstructions1 = FALSE;
+        
+        ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
+        errors->setVisible(FALSE);            
+
+        //ofxUIButton *button = (ofxUIButton *) e.widget;
+        //button->setValue(FALSE);
+        ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui3->getWidget("POS");
+        rotary->setValue(0.0);        
+        ofxUISlider *volume = (ofxUISlider *) gui3->getWidget("VOL");
+        volume->setValue(75);
+            
+        //load the gui
+        if (stage==0)   gui1->disable();    
+        else    gui2->disable();    
+        toggleInstructions1 = FALSE;
+        toggleInstructions2 = FALSE;
+        toggleInstructions3 = FALSE;
+        gui3->enable(); 
     }
 }
 
 
+//---------MATLAB
 
+//run matlab script
+void testApp::callScript()
+{
+    if (!matlabScript.isThreadRunning())
+    {
+        string command=appToLaunchPath;
+        command.replace(command.find("path"), 4, ofFilePath::getAbsolutePath(scriptDirectory));
+        text.clear();text.str("");
+        text << ofFilePath::getAbsolutePath("data") << "/" << usert.getName() << ".xml";
+        command.replace(command.find("xmlin"), 5, text.str());
+        text.clear();text.str("");
+        text << ofFilePath::getAbsolutePath("data") << "/" << usert.getName() << "out.xml";
+        command.replace(command.find("xmlout"), 6, text.str());
+        matlabScript.path = command;
+        matlabScript.start();
+    }
+}
+
+
+//load the results from the xml
+void testApp::loadXmlResults()
+{
+    text.clear();text.str("");
+    text <<  "data/" << usert.getName() << "out.xml";
+    //parse xml
+    
+    //needs to be replaced with the actual results
+    results.setText(text.str());
+    results.wrapTextX(ofGetHeight()-OFX_UI_GLOBAL_WIDGET_SPACING);     
+    results.setColor(240, 240, 240, 180);
+
+}

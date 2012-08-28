@@ -47,10 +47,9 @@ class threadedObject : public ofThread{
 				if( lock() ){
                     count++;
                     system(path.c_str());
-					cout << " THREAD START " << count << endl;
 					unlock();
 					ofSleepMillis(1 * 1000);
-                    //stop();
+                    stop();
 				}
 			}
 		}

@@ -34,11 +34,14 @@ public:
     int midiChannel;
     int midiNote;
     int noPlays;
+    bool launchScript;
+    string scriptDirectory;
+    string appToLaunchPath;    
     bool tapWithSpace;
     int itemDimGUI;
     string instrGUI1, instrGUI2;
-    ofxTextBlock instructions1,instructions2;    
-    bool toggleInstructions1,toggleInstructions2,toggleInstructions3;
+    ofxTextBlock instructions1,instructions2, results;    
+    bool toggleInstructions1,toggleInstructions2,toggleInstructions3, toggleResults;
     stringstream text;   
     
     void loadXmlSettings(string fileName);
@@ -92,6 +95,7 @@ public:
     
     //MATLAB
     threadedObject	matlabScript;
-      
+    void callScript();  
+    void loadXmlResults();
 
 };

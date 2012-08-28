@@ -5,5 +5,7 @@
     <noPlays>2</noPlays>
     <tapWithSpace>1</tapWithSpace>
     <itemDimGUI>24</itemDimGUI>
-    <appToLaunchPath>matlab</appToLaunchPath>
+    <launchScript>0</launchScript>
+    <scriptDirectory>xml_io_tools</scriptDirectory>
+    <appToLaunchPath>/Applications/MATLAB_R2011b.app/bin/matlab -nosplash -nodesktop -r "cd path , try, tapping xmlin xmlout, catch, handleTheError, end, exit"</appToLaunchPath>
 </settings>
