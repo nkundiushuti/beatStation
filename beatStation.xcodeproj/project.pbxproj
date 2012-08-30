@@ -23,6 +23,10 @@
 		DF52535315E53090002AA771 /* ofxRtMidiOut.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF52534B15E53090002AA771 /* ofxRtMidiOut.cpp */; };
 		DF52535415E53090002AA771 /* RtMidi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF52535015E53090002AA771 /* RtMidi.cpp */; };
 		DF82663B15E6381D0000CBBE /* ofxTextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DF82663815E6381D0000CBBE /* ofxTextBlock.cpp */; };
+		DFB1DED615ED1DF3005FC3C1 /* ofxTCPClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFB1DECE15ED1DF3005FC3C1 /* ofxTCPClient.cpp */; };
+		DFB1DED715ED1DF3005FC3C1 /* ofxTCPManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFB1DED015ED1DF3005FC3C1 /* ofxTCPManager.cpp */; };
+		DFB1DED815ED1DF3005FC3C1 /* ofxTCPServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFB1DED215ED1DF3005FC3C1 /* ofxTCPServer.cpp */; };
+		DFB1DED915ED1DF3005FC3C1 /* ofxUDPManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DFB1DED415ED1DF3005FC3C1 /* ofxUDPManager.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
 		E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */; };
@@ -146,6 +150,16 @@
 		DF82663A15E6381D0000CBBE /* ofxTextSuite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTextSuite.h; path = addons/src/ofxTextSuite.h; sourceTree = "<group>"; };
 		DF89906B15E689A60060494C /* threadedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadedObject.h; sourceTree = "<group>"; };
 		DF8F7B9015E24B79006A4590 /* Usert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Usert.h; sourceTree = "<group>"; };
+		DFB1DECC15ED1DF3005FC3C1 /* ofxNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxNetwork.h; path = addons/src/ofxNetwork.h; sourceTree = "<group>"; };
+		DFB1DECD15ED1DF3005FC3C1 /* ofxNetworkUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxNetworkUtils.h; path = addons/src/ofxNetworkUtils.h; sourceTree = "<group>"; };
+		DFB1DECE15ED1DF3005FC3C1 /* ofxTCPClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxTCPClient.cpp; path = addons/src/ofxTCPClient.cpp; sourceTree = "<group>"; };
+		DFB1DECF15ED1DF3005FC3C1 /* ofxTCPClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTCPClient.h; path = addons/src/ofxTCPClient.h; sourceTree = "<group>"; };
+		DFB1DED015ED1DF3005FC3C1 /* ofxTCPManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxTCPManager.cpp; path = addons/src/ofxTCPManager.cpp; sourceTree = "<group>"; };
+		DFB1DED115ED1DF3005FC3C1 /* ofxTCPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTCPManager.h; path = addons/src/ofxTCPManager.h; sourceTree = "<group>"; };
+		DFB1DED215ED1DF3005FC3C1 /* ofxTCPServer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxTCPServer.cpp; path = addons/src/ofxTCPServer.cpp; sourceTree = "<group>"; };
+		DFB1DED315ED1DF3005FC3C1 /* ofxTCPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxTCPServer.h; path = addons/src/ofxTCPServer.h; sourceTree = "<group>"; };
+		DFB1DED415ED1DF3005FC3C1 /* ofxUDPManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxUDPManager.cpp; path = addons/src/ofxUDPManager.cpp; sourceTree = "<group>"; };
+		DFB1DED515ED1DF3005FC3C1 /* ofxUDPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxUDPManager.h; path = addons/src/ofxUDPManager.h; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
 		E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
@@ -279,6 +293,16 @@
 		DF8F7B9115E24C20006A4590 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				DFB1DECC15ED1DF3005FC3C1 /* ofxNetwork.h */,
+				DFB1DECD15ED1DF3005FC3C1 /* ofxNetworkUtils.h */,
+				DFB1DECE15ED1DF3005FC3C1 /* ofxTCPClient.cpp */,
+				DFB1DECF15ED1DF3005FC3C1 /* ofxTCPClient.h */,
+				DFB1DED015ED1DF3005FC3C1 /* ofxTCPManager.cpp */,
+				DFB1DED115ED1DF3005FC3C1 /* ofxTCPManager.h */,
+				DFB1DED215ED1DF3005FC3C1 /* ofxTCPServer.cpp */,
+				DFB1DED315ED1DF3005FC3C1 /* ofxTCPServer.h */,
+				DFB1DED415ED1DF3005FC3C1 /* ofxUDPManager.cpp */,
+				DFB1DED515ED1DF3005FC3C1 /* ofxUDPManager.h */,
 				DF82663815E6381D0000CBBE /* ofxTextBlock.cpp */,
 				DF82663915E6381D0000CBBE /* ofxTextBlock.h */,
 				DF82663A15E6381D0000CBBE /* ofxTextSuite.h */,
@@ -494,6 +518,10 @@
 				DF52535315E53090002AA771 /* ofxRtMidiOut.cpp in Sources */,
 				DF52535415E53090002AA771 /* RtMidi.cpp in Sources */,
 				DF82663B15E6381D0000CBBE /* ofxTextBlock.cpp in Sources */,
+				DFB1DED615ED1DF3005FC3C1 /* ofxTCPClient.cpp in Sources */,
+				DFB1DED715ED1DF3005FC3C1 /* ofxTCPManager.cpp in Sources */,
+				DFB1DED815ED1DF3005FC3C1 /* ofxTCPServer.cpp in Sources */,
+				DFB1DED915ED1DF3005FC3C1 /* ofxUDPManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

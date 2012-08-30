@@ -5,6 +5,7 @@
 #include "ofxTextSuite.h"
 #include "ofxUI.h"
 #include "ofxDirList.h"
+#include "ofxNetwork.h"
 #include "threadedObject.h"
 #include "Usert.h"
 #include <sstream>
@@ -30,6 +31,7 @@ public:
     
     
     //SETTINGS
+    bool verbose;
     int midiPort;
     int midiChannel;
     int midiNote;
@@ -39,6 +41,9 @@ public:
     string appToLaunchPath;    
     bool tapWithSpace;
     int itemDimGUI;
+    bool isClient;
+    int tcpPort;
+    string ipServer;
     string instrGUI1, instrGUI2;
     ofxTextBlock instructions1,instructions2, results;    
     bool toggleInstructions1,toggleInstructions2,toggleInstructions3, toggleResults;
@@ -73,13 +78,11 @@ public:
     
     //USER
     Usert usert; 
-    int* uIDs;
-    string* uNames;
-    int* uNameID;
-    int* tempIDs;
-    string* tempNames;
-    int* tempNameID;
+    vector<int>uIDs;
+    vector<string>uNames;
+    string tempName;
     bool newUser;
+    bool fromStart;
     int nrUsers;
     int maxID;
     
@@ -93,9 +96,17 @@ public:
     void array_union(int* arr, string* sarr, int n);
     void randomOrder(int uid);  
     
+    
     //MATLAB
     threadedObject	matlabScript;
     void callScript();  
     void loadXmlResults();
-
+    
+    
+    //TCP CLIENT/SERVER
+    ofxTCPClient tcpClient;
+    ofxTCPServer tcpServer;    
+    bool weConnected, sendToServer;
+    int deltaTime, connectTime;	
+     
 };

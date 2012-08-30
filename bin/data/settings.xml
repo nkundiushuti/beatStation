@@ -1,4 +1,5 @@
 <settings>
+    <verbose>1</verbose>
     <midiPort>0</midiPort>
     <midiChannel>10</midiChannel>
     <midiNote>46</midiNote>
@@ -8,4 +9,7 @@
     <launchScript>0</launchScript>
     <scriptDirectory>xml_io_tools</scriptDirectory>
     <appToLaunchPath>/Applications/MATLAB_R2011b.app/bin/matlab -nosplash -nodesktop -r "cd path , try, tapping xmlin xmlout, catch, handleTheError, end, exit"</appToLaunchPath>
+    <isClient>0</isClient>
+    <tcpPort>9001</tcpPort>
+    <ipServer>127.0.0.1</ipServer>
 </settings>

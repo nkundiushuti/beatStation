@@ -32,7 +32,7 @@ private:
 public:
     
     Usert(){};
-    
+     
     ~Usert() { if ((currentSound > 0) || (ID > -1)) delete[] sounds; }
         
     void setName (string uname){ name = uname; }

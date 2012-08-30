@@ -3,3 +3,4 @@ ofxUI
 ofxXMLSettings
 ofxDirList
 ofxTextSuite
+ofxNetwork

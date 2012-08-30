@@ -2,24 +2,32 @@
 
 //--------------------------------------------------------------
 void testApp::setup() {
-	//ofSetVerticalSync(true);
-	//ofBackground(255, 255, 255);
+    ofSetFrameRate(1000);
 	//ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetEscapeQuitsApp(FALSE);
     ofSetFullscreen(1);  
-        
     
     //LOAD SETTINGS
     loadXmlSettings("settings.xml");    
-      
+  
         
     //LOAD USERS 
     nrUsers = 0;
     maxID = 0;
-    loadXmlUser("data/users.xml");     
+    if (isClient) 
+    {
+        if (verbose) cout << " BEAT STATION CLIENT " << endl;
+    }
+    else
+    {    
+        if (verbose) cout << " BEAT STATION SERVER " << endl;
+        loadXmlUser("data/users.xml"); 
+    }
     //usert.initTranscription(numSounds);
     usert.setName("");
     usert.setID(-1);  
+    usert.currentSound = -1;
+    fromStart = FALSE;
         
     
     //LOAD SOUNDS
@@ -29,13 +37,15 @@ void testApp::setup() {
     for(int i = 0; i < numSounds; i++){
         songNames[i] = DIR.getPath(i);
     }  
+    if (numSounds<2) {cout << "NO SOUNDS IN THE SOUND DIRECTORY!" << endl; exitApp();}
     
     
     ///////MIDI	INTERFACE
 	midiIn.openPort(midiPort);
 	//midiIn.openPort("IAC Pure Data In");	// by name
 	midiIn.ignoreTypes(false, false, false);
-    midiIn.addListener((ofxMidiListener *)this);       
+    midiIn.addListener((ofxMidiListener *)this);    
+        
     
     /////////// INITIALIZE GUI SETTINGS
     float dim = itemDimGUI; 
@@ -138,13 +148,35 @@ void testApp::setup() {
     {
         gui4->addWidgetDown(new ofxUILabel("RESULTS", OFX_UI_FONT_MEDIUM));        
         results.init("GUI/NewMedia Fett.ttf", 12);
+    }    
+   
+    
+    //TCP CLIENT SERVER   
+    if (isClient) 
+    {
+        //are we connected to the server - if this fails we
+        //will check every few seconds to see if the server exists
+        weConnected = tcpClient.setup(ipServer, tcpPort);
+        
+        sendToServer = FALSE;
+        connectTime = 0;
+        deltaTime = 0;
+        
     }
+    else
+    {
+        //setup the server to listen on specific port
+        tcpServer.setup(tcpPort);        
+    }
+     
     
 }
 
 
 //--------------------------------------------------------------
-void testApp::update() {
+void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
+    
+    //WHILE SOUND PLAYING, GET MIDI TAPPING, UPDATE ROTARY SLIDER
     if (beats.getIsPlaying())
     {
         if (midiMessage.status == MIDI_CONTROL_CHANGE)
@@ -160,10 +192,257 @@ void testApp::update() {
             rotary->setValue(beats.getPosition()*100);
     }
     
+    
+    //SET VOLUME
     ofxUISlider *volume = (ofxUISlider *) gui3->getWidget("VOL");
     beats.setVolume(volume->getValue());
     
+    
+    //WAIT FOR MATLAB SCRIPT TO END
     if (launchScript) matlabScript.waitForThread();
+    
+    
+    //USER MANAGEMENT, TCP CLIENT/SERVER
+    int code=-1;
+    vector<string> tokens;
+    string msgRx="",msgTx="";
+    bool safeToStart = FALSE;
+    ofxUILabel *errors = (ofxUILabel*) gui1->getWidget("ERRORS");
+    
+    //IMPORTANT! we have to be careful with this because it will happen every frame like in a loop
+    
+    //if SERVER, first we add any users from the clients
+    //SERVER LISTENING FOR NEW USERS EVERY FRAME
+    if ((!isClient) && (tcpServer.getLastID() >0) )
+    {
+        //for each connected client lets get the data being sent 
+        for(int i = 0; i < tcpServer.getLastID(); i++)
+        {   
+            //receive a message
+            msgRx = "";
+            if( !tcpServer.isClientConnected(i) )continue;
+            msgRx = tcpServer.receive(i);
+            
+            if (msgRx.length() > 0) 
+            {
+                //parse the message
+                tokens = ofSplitString(msgRx.c_str(),";");
+                if (tokens.size()>1)
+                {
+                    code=-1;
+                    int newU = ofToInt(tokens[0]);
+                    string userName = tokens[1];
+                    msgTx = "";
+                    if(verbose) {cout << " received message from client " << i << " with ip " << tcpServer.getClientIP(i) << endl;cout << " message: " << msgRx << endl;}
+                    //add the user to the database or check if it exists
+                    if (newU==1)
+                    {
+                        //get the max id with the existing user with same initials
+                        code = checkUser(userName);
+                        
+                        //increment maxID and nrUsers
+                        maxID++;
+                        nrUsers++;
+                        
+                        //send back the data                        
+                        text.clear();text.str("");
+                        text << maxID << ";" << userName << code << ";";                        
+                        tcpServer.send(i, text.str());
+                        if(verbose) cout << " sent back to client " << text.str() << endl;
+                        
+                        //add new user
+                        uIDs.push_back(maxID);
+                        text.clear();text.str("");
+                        text  << userName << code ;
+                        uNames.push_back(text.str());
+                        
+                        
+                    }
+                    else
+                    {
+                        //get the max id with the existing user with same initials
+                        code = getUserID(userName);
+                        
+                        //send back the data
+                        text.clear();text.str("");
+                        text << code << ";";                        
+                        tcpServer.send(i, text.str());
+                        if(verbose) cout << " sent back to client " << text.str() << endl;
+                    }   
+                }
+                //clear the tokens vector so we can receive a new message
+                tokens.clear();
+            }
+        }  
+    }
+
+    //then we add the new local user
+    if (fromStart)
+    {
+        code = -1;
+        
+        if (isClient) //CLIENT
+        {
+            msgRx="";
+            
+            //send the data to server and get the message
+            if (sendToServer)
+            {
+                //we are connected - lets send our text and check what we get back
+                if(weConnected){
+                    if(verbose) cout << " connected to server " << endl;
+                    
+                    //what we need to send
+                    text.clear();text.str("");
+                    text << newUser << ";" << tempName << ";";
+                    
+                    if(tcpClient.send(text.str()))
+                    {
+                        //ok we manage to send it so we can exit the loop
+                        sendToServer = FALSE;
+                        if(verbose) cout << " sent message to server " << endl;
+                        
+                        //if data has been sent lets receive the response
+                        string str = tcpClient.receive();
+                        if( str.length() > 0 ){
+                            msgRx = str;
+                        }
+                    }else if(!tcpClient.isConnected()){
+                        weConnected = false;
+                    }
+                }else{
+                    //if we are not connected lets try and reconnect every 5 seconds
+                    deltaTime = ofGetElapsedTimeMillis() - connectTime;
+                    if( deltaTime > 5000 ){
+                        if(verbose) cout << " attempting to reconnect to server " << endl;
+                        weConnected = tcpClient.setup(ipServer, tcpPort);
+                        connectTime = ofGetElapsedTimeMillis();
+                        errors->setLabel("CONNECTING...");
+                        errors->setVisible(TRUE);
+                    }        
+                }
+            } 
+            else
+            {
+                //if data has been sent lets receive the response
+                string str = tcpClient.receive();
+                if( str.length() > 0 ){
+                    if(verbose) cout << " received back message " << str << endl;
+                    msgRx = str;
+                    errors->setVisible(FALSE);
+                }
+            }
+            
+            //ok we finally received our message back from the server
+            if (msgRx.length()>0) 
+            {
+                //parse the message
+                if (newUser)
+                {
+                    tokens = ofSplitString(msgRx.c_str(),";"); 
+                    code = ofToInt(tokens[0]); 
+                    tempName = tokens[1]; 
+                }
+                else
+                {
+                    tokens = ofSplitString(msgRx.c_str(),";");
+                    code = ofToInt(tokens[0]);   
+                }
+                safeToStart = TRUE;
+                tokens.clear();
+            }
+            else
+            {
+                errors->setLabel("AUTHENTICATING...");
+                errors->setVisible(TRUE);
+            }
+        }
+        else //SERVER
+        {
+            if (newUser)
+            {
+                //get the max id with the existing user with same initials
+                code = checkUser(tempName);
+                
+                //assign an ID to the new user, the maximum ID + 1 
+                maxID++;
+                nrUsers++;
+                uIDs.push_back(maxID);
+                text.clear();text.str("");
+                text << tempName << code;
+                uNames.push_back(text.str());
+                
+                //initialize the current user
+                code = maxID;
+                tempName = text.str(); 
+                                
+                //save all the existing users!
+                saveXmlUser("data/users.xml");
+            }
+            //get the max id with the existing user with same initials
+            else code = getUserID(tempName);     
+            
+            safeToStart = TRUE;
+        }
+        
+        //if we already have an user set, let's make everything ready 
+        if (safeToStart)
+        {
+            //now we check what we've got
+            if (code == -1) 
+            {
+                errors->setLabel("ERROR! THE USER WITH THIS ID DOESN'T EXIST IN THE DATABASE");
+                errors->setVisible(TRUE);
+                safeToStart = FALSE;
+                fromStart = FALSE;
+            }
+            else 
+            {
+                usert.setID(code);
+                usert.setName(tempName); 
+                safeToStart = TRUE;
+            }
+        }
+                
+        //if we already have an user set, let's make everything ready 
+        if (safeToStart)
+        {
+            if (newUser) //LOAD INSTRUCTIONS
+            {
+                //init transcription
+                usert.initTranscription(numSounds);  
+                usert.currentSound = 0;
+                randomOrder(usert.getID());               
+                
+                //LOAD THE INSTRUCTIONS GUI
+                text.clear();text.str("");
+                text << "TAPPER ID: " << usert.getName() << " ";
+                ofxUILabel *userL = (ofxUILabel *) gui2->getWidget("ID");
+                userL->setLabel(text.str());
+                toggleInstructions1 = FALSE;
+                toggleInstructions2 = TRUE;
+                gui1->disable();
+                gui2->enable();
+            }
+            else //LOAD TAPPING 
+            {
+                //load transcription
+                usert.initTranscription(numSounds);  
+                text.clear();text.str("");
+                text << "data/" << tempName << ".xml";
+                loadXmlTap(text.str());                   
+                randomOrder(usert.getID());
+                
+                //LOAD TAPPING INTERFACE
+                loadTapping(0);
+            }
+            
+            fromStart = FALSE;
+        }
+
+    }
+       
+        
 }
 
 //--------------------------------------------------------------
@@ -204,23 +483,33 @@ void testApp::draw() {
         ofxUILabel *label = (ofxUILabel *) gui4->getWidget("RESULTS");
         ofxUIRectangle *rect = (ofxUIRectangle *) label->getRect(); 
         results.drawLeft(rect->getX(), rect->getY() + rect->getHeight() + label->getPadding());
-    }    
+    } 
+
     
 }
 
 //--------------------------------------------------------------
 void testApp::exit() {
+    
+    if (isClient) tcpClient.close();
+    else if (tcpServer.close()) 
+    {
+        tcpServer.unlock();
+        tcpServer.stopThread();
+        //save all the existing users!
+        saveXmlUser("data/users.xml");
+    }
+    
     matlabScript.stop();
     
     delete gui1;
     delete gui3;
 	delete gui4;
-    delete[] uIDs;
-    delete[] uNames;
     
 	// clean up
 	midiIn.closePort();
-	midiIn.removeListener(this);
+	midiIn.removeListener(this);    
+   
 }
 
 //--------------------------------------------------------------
@@ -288,7 +577,9 @@ void testApp::loadXmlSettings(string fileName)
         {   
             xmlSet.pushTag("settings");               
              
-            //load midi settings
+            //load settings
+            if (xmlSet.getValue("verbose", 1)) verbose = TRUE;
+            else verbose = FALSE;
             midiPort = xmlSet.getValue("midiPort", 0);
             midiChannel = xmlSet.getValue("midiChannel", 10);
             midiNote = xmlSet.getValue("midiNote", 46); 
@@ -300,10 +591,15 @@ void testApp::loadXmlSettings(string fileName)
             else launchScript = FALSE;
             scriptDirectory =  xmlSet.getValue("scriptDirectory", "");
             appToLaunchPath =  xmlSet.getValue("appToLaunchPath", "");
+            if (xmlSet.getValue("isClient", 1)) isClient = TRUE;
+            else isClient = FALSE;
+            tcpPort = xmlSet.getValue("tcpPort", 9001);
+            ipServer = xmlSet.getValue("ipServer", "127.0.0.1");;
                     
             xmlSet.popTag();  
         }
         else {
+            verbose = FALSE;
             midiPort = 0;
             midiChannel = 10;
             midiNote = 46;
@@ -313,9 +609,13 @@ void testApp::loadXmlSettings(string fileName)
             appToLaunchPath = "";
             launchScript = FALSE;
             scriptDirectory = "";
+            isClient = FALSE;
+            tcpPort = 9001;
+            ipServer = "127.0.0.1";
         }
     }
     else {
+        verbose = FALSE;
         midiPort = 0;
         midiChannel = 10;
         midiNote = 46;
@@ -323,10 +623,14 @@ void testApp::loadXmlSettings(string fileName)
         tapWithSpace = TRUE;
         itemDimGUI = 24;
         appToLaunchPath = "";
+        launchScript = FALSE;
+        scriptDirectory = "";
+        isClient = FALSE;
+        tcpPort = 9001;
+        ipServer = "127.0.0.1";
     }
     
 }
-
 
 
 
@@ -344,7 +648,7 @@ void testApp::saveXmlUser(string fileName)
     xmlUser.setValue("maxID", maxID + 1);
     
     //add all the existing users
-    for(int i = 0; i <= nrUsers; i++){
+    for(int i = 0; i < nrUsers; i++){
         //each position tag represents one user
         xmlUser.addTag( "user" );
         xmlUser.pushTag( "user" , i);
@@ -373,39 +677,18 @@ void testApp::loadXmlUser(string fileName)
         {
             xmlUser.pushTag("users");
             
-            if (nrUsers==0) //when entering the program we have to add all users stored
+            if (nrUsers<1) //when entering the program we have to add all users stored
             {
                 //get records from the xml
-                nrUsers = xmlUser.getNumTags("user");  
-                uIDs = new int[nrUsers+1];
-                uNames = new string[nrUsers+1];
+                nrUsers = xmlUser.getNumTags("user"); 
+                maxID=-1;
                 for(int i = 0; i < nrUsers; i++){
                     xmlUser.pushTag("user", i);            
-                    uIDs[i] = xmlUser.getValue("ID", 0);
-                    uNames[i] = xmlUser.getValue("name", ""); 
-                    xmlUser.popTag();            
+                    uIDs.push_back(xmlUser.getValue("ID", 0));
+                    uNames.push_back(xmlUser.getValue("name", "")); 
+                    xmlUser.popTag();                        
+                    if (maxID<uIDs[i]) maxID=uIDs[i]; 
                 }      
-                maxID = uIDs[nrUsers-1];
-            }
-            else //we need to syncronize the users we have with the ones from xml database
-            {
-                //get records from the xml
-                int xmlRecords = xmlUser.getNumTags("user");   
-                int * xmlIDs = new int[xmlRecords];
-                string * xmlNames = new string[xmlRecords];
-                for(int i = 0; i < xmlRecords; i++){
-                    xmlUser.pushTag("user", i);            
-                    xmlIDs[i] = xmlUser.getValue("ID", 0);
-                    xmlNames[i] = xmlUser.getValue("name", "");        
-                    xmlUser.popTag();            
-                }  
-                //merge existing data with the xml data
-                array_union(xmlIDs, xmlNames, xmlRecords);                
-                maxID = uIDs[nrUsers-1];
-                
-                //free memory
-                delete[] xmlIDs;
-                delete[] xmlNames;
             }
             
             xmlUser.popTag(); //pop position
@@ -413,16 +696,12 @@ void testApp::loadXmlUser(string fileName)
         else
         {
             //first time, xml is empty
-            uIDs = new int[1];
-            uNames = new string[1];
             maxID = -1;
             nrUsers = 0;
         }
     }
     else{
         //first time, xml doesn't exist
-        uIDs = new int[1];
-        uNames = new string[1];
         maxID = -1;
         nrUsers = 0;
     }
@@ -506,7 +785,6 @@ void testApp::loadXmlTap(string fileName)
                     transcript = xmlTap.getValue("transcription", "");      
                     text.clear();text.str("");
                     text << transcript;
-                    vector<string> tokens;
                     while (text >> t)                        
                         usert.sounds[i].time.push_back(t);
                     
@@ -518,51 +796,6 @@ void testApp::loadXmlTap(string fileName)
         else usert.currentSound=0;
     }
     else usert.currentSound=0;
-    
-}
-
-
-//union of arrays
-void testApp::array_union(int* arr, string* sarr, int n)
-{
-    int i = 0, j = 0, k = 0;
-    tempIDs = new int[n+nrUsers];
-    tempNames = new string[n+nrUsers];
-    while ((i < n ) || (j < nrUsers))
-    {
-        if(arr[i] == uIDs[j]) 
-        { // found a common element.
-            tempIDs[k] = arr[i];
-            tempNames[k] = sarr[i];
-            i++; // move on.
-            j++;
-        }
-        else if(arr[i] > uIDs[j])
-        {
-            tempIDs[k] = uIDs[j];
-            tempNames[k] =  uNames[j];
-            j++;// don't change i, move j.
-        }
-        else
-        {
-            tempIDs[k] = arr[i];
-            tempNames[k] = sarr[i];
-            i++;// don't change j, move i.
-        }
-        k++;
-    }
-    
-    delete[] uIDs;
-    delete[] uNames;
-    nrUsers = k;
-    uIDs = new int[nrUsers+1]; //nrUsers+1 because after this we need to add a new user
-    uNames = new string[nrUsers+1];
-    for(int i = 0; i < nrUsers; i++){
-        uIDs[i] = tempIDs[i];
-        uNames[i] = tempNames[i];
-    }
-    delete[] tempIDs;
-    delete[] tempNames;
     
 }
 
@@ -642,14 +875,9 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
         ofxUITextInput *uName = (ofxUITextInput *) gui1->getWidget("ID");        
         string name = uName->getTextString(); 
         uName->setTextString("");
-        
-        //check for errors 
-        
-        //check log-in errors, refresh the data
+        tempName = "";
        
-            //load and refresh the xml data
-            loadXmlUser("data/users.xml"); 
-            
+        //check log-in errors
         if (newUser) 
         {
             //check semantic errors
@@ -659,43 +887,15 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
                 errors->setVisible(TRUE);
             }
             else
-            {                    
-                //get the max id with the existing user with same initials
-                int code = checkUser(name);
-            
-                //assign an ID to the new user, the maximum ID + 1 
-                uIDs[nrUsers] = maxID+1;
-                text.clear();text.str("");
-                text << name << code;
-                uNames[nrUsers] = text.str();
-                usert.setID(maxID+1);
-                usert.setName(text.str()); 
-            
-                //save the new user
-                saveXmlUser("data/users.xml");
-            
-                //init transcription
-                //usert.deleteTranscription();
-                usert.initTranscription(numSounds);  
-                usert.currentSound = 0;
-                randomOrder(usert.getID());   
-                
-                
-                //SHOW THE INSTRUCTIONS GUI
-                //user
-                text.clear();text.str("");
-                text << "TAPPER ID: " << usert.getName() << " ";
-                ofxUILabel *userL = (ofxUILabel *) gui2->getWidget("ID");
-                userL->setLabel(text.str());
-                toggleInstructions1 = FALSE;
-                toggleInstructions2 = TRUE;
-                gui1->disable();
-                gui2->enable();
-                
-            }
+            {    
+                tempName = name;
+                fromStart = TRUE;
+                if(isClient) sendToServer = TRUE;
+            }    
+                        
         }
         else //existing user
-        {                
+        {    
             //check semantic errors
             if ( (name.length() < 3) || (name.substr(0,1) == " ") )
             {
@@ -704,30 +904,10 @@ void testApp::guiEvent1(ofxUIEventArgs &e)
             }
             else
             {
-                //get the max id with the existing user with same initials
-                int code = getUserID(name);
-                if (code == -1) 
-                {
-                    errors->setLabel("ERROR! THE USER WITH THIS ID DOESN'T EXIST IN THE DATABASE");
-                    errors->setVisible(TRUE);
-                }
-                else 
-                {
-                    usert.setID(code);
-                    usert.setName(name); 
-                    //load transcription
-                    //usert.deleteTranscription();
-                    usert.initTranscription(numSounds);  
-                    text.clear();text.str("");
-                    text << "data/" << name << ".xml";
-                    loadXmlTap(text.str());                   
-                    randomOrder(usert.getID());
-                    
-                    //LOAD TAPPING INTERFACE
-                    loadTapping(0);
-                }
+                tempName = name;
+                fromStart = TRUE;
+                if(isClient) sendToServer = TRUE;
             }
-            
         }
     }  
     
@@ -791,6 +971,7 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
         else if ((usert.currentSound == (numSounds-1)) && (played>0)) //move to the results stage
         {  
             usert.currentSound++;
+            
             //save the tapping to xml
             text.clear();text.str("");
             text << "data/" << usert.getName() << ".xml";
@@ -838,9 +1019,11 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
     //quit tapping to the log-in
 	if ((e.widget->getName() == "QUIT") && (button->getValue()==1))	
     { 
+        if (beats.getIsPlaying()) beats.stop();
+        
         if (usert.currentSound > 0)
         {
-            usert.currentSound--;
+            usert.currentSound--;  //comment this if you want to save the current song
             //save the tapping to xml
             text.clear();text.str("");
             text << "data/" << usert.getName() << ".xml";
@@ -851,7 +1034,7 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
         //clear the data
         usert.setName("");
         usert.setID(-1);
-        usert.currentSound = 0;
+        usert.currentSound = -1;
         usert.deleteTranscription();
         
         //load the gui1     
@@ -860,6 +1043,7 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
         button->setValue(FALSE);
         ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
         radio->activateToggle("NEW"); 
+        newUser = TRUE;
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget("INITIALS");
         label->setLabel("INITIALS");
         gui3->disable();
@@ -871,8 +1055,7 @@ void testApp::guiEvent3(ofxUIEventArgs &e)
     if ((e.widget->getName() == "INSTRUCTIONS") && (button->getValue()==1))	
     {     
         //show/hide the instructions
-        toggleInstructions3 = !toggleInstructions3;
-        
+        toggleInstructions3 = !toggleInstructions3;        
     }
     
 }
@@ -901,6 +1084,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
         button->setValue(FALSE);
         ofxUIRadio *radio = (ofxUIRadio *) gui1->getWidget("USER");
         radio->activateToggle("NEW"); 
+        newUser = TRUE;
         ofxUILabel *label = (ofxUILabel *) gui1->getWidget("INITIALS");
         label->setLabel("INITIALS");
         gui4->disable();
@@ -999,3 +1183,5 @@ void testApp::loadXmlResults()
     results.setColor(240, 240, 240, 180);
 
 }
+
+
