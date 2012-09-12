@@ -31,6 +31,7 @@ public:
     
     
     //SETTINGS
+    int fps;
     bool verbose;
     int midiPort;
     int midiChannel;
@@ -40,6 +41,7 @@ public:
     string scriptDirectory;
     string appToLaunchPath;    
     bool tapWithSpace;
+    bool canQuit;
     int itemDimGUI;
     bool isClient;
     int tcpPort;
@@ -53,6 +55,7 @@ public:
 	
     
     //MIDI
+    int tempTime;
 	void newMidiMessage(ofxMidiMessage& eventArgs);		
 	ofxMidiIn midiIn;
 	ofxMidiMessage midiMessage;
@@ -67,12 +70,13 @@ public:
     
     
     //GUI    
-    ofxUICanvas *gui1,*gui2,*gui3, *gui4;
+    ofxUICanvas *gui1,*gui2,*gui3, *gui4, *gui5;
     
     void guiEvent1(ofxUIEventArgs &e);
     void guiEvent2(ofxUIEventArgs &e);
     void guiEvent3(ofxUIEventArgs &e); 
     void guiEvent4(ofxUIEventArgs &e); 
+    void guiEvent5(ofxUIEventArgs &e); 
     void loadTapping(int stage);
     
     
@@ -80,7 +84,15 @@ public:
     Usert usert; 
     vector<int>uIDs;
     vector<string>uNames;
+    vector<int>uMF;
+    vector<int>uAge;
+    vector<int>uYears;
+    vector<int>uFam;
     string tempName;
+    int tempAge;
+    int tempMF;
+    int tempYears;
+    int tempFam;
     bool newUser;
     bool fromStart;
     int nrUsers;
@@ -108,5 +120,8 @@ public:
     ofxTCPServer tcpServer;    
     bool weConnected, sendToServer;
     int deltaTime, connectTime;	
+    
+    //UTILS
+    bool is_number(string s);
      
 };

@@ -1,10 +1,12 @@
 <settings>
     <verbose>1</verbose>
+    <fps>1000</fps>
     <midiPort>0</midiPort>
-    <midiChannel>10</midiChannel>
-    <midiNote>46</midiNote>
+    <midiChannel>0</midiChannel>
+    <midiNote>0</midiNote>
     <noPlays>2</noPlays>
     <tapWithSpace>1</tapWithSpace>
+    <canQuit>1</canQuit>
     <itemDimGUI>24</itemDimGUI>
     <launchScript>0</launchScript>
     <scriptDirectory>xml_io_tools</scriptDirectory>

@@ -27,7 +27,11 @@ public:
 class Usert {
 private:
     string name; //initials
-    int ID; //unique id - index   
+    int ID; //unique id - index  
+    int age;
+    bool sex;
+    int yearsTraining;
+    int familiarity;
         
 public:
     
@@ -39,6 +43,14 @@ public:
     string getName (){ return name; }
     void setID (int uID){ ID = uID; }
     int getID (){ return ID;}
+    void setAge (int uage){ age = uage; }
+    int getAge (){ return age; }
+    void setSex (int usex){ sex = usex; }
+    bool getSex (){ return sex; }
+    void setYears (int uyears){ yearsTraining = uyears; }
+    int getYears (){ return yearsTraining; }
+    void setFam (int ufam){ familiarity = ufam; }
+    int getFam (){ return familiarity; }
     void initTranscription (int n){ sounds = new Transcription[n]; } 
     void deleteTranscription (){ delete[] sounds; }
   
