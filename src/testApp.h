@@ -67,6 +67,7 @@ public:
     int numSounds;
     string* songNames;
     int played;
+    bool play;
     
     
     //GUI    

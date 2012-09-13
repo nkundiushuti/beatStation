@@ -40,6 +40,7 @@ void testApp::setup() {
         songNames[i] = DIR.getPath(i);
     }  
     if (numSounds<2) {cout << "NO SOUNDS IN THE SOUND DIRECTORY!" << endl; exitApp();}
+    play = FALSE;
     
     
     ///////MIDI	INTERFACE
@@ -212,6 +213,13 @@ void testApp::setup() {
 //--------------------------------------------------------------
 void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
     
+    if (play)
+    {
+        //ofSleepMillis(1000);
+        beats.play();
+        play = FALSE;
+    }
+    
     //WHILE SOUND PLAYING, GET MIDI TAPPING, UPDATE ROTARY SLIDER
     if (beats.getIsPlaying())
     {
@@ -234,6 +242,7 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
         //update playing widget
         ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
         rotary->setValue(beats.getPosition()*100);
+        //cout << rotary->getValue();
     }
     else
     {
@@ -804,7 +813,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
 	if ((e.widget->getName() == "PLAYF") && (button->getValue()==1))	
     {         
         if (!beats.isLoaded()) { cout << "sound failed to load" << endl; }
-        else if ((!beats.getIsPlaying()) && (played<(noPlays+1))) 
+        else if ((!beats.getIsPlaying()) && (played<noPlays)) 
         {
             //update playing widget
             ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
@@ -813,9 +822,10 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             //clear transcription vector for the current sound
             tempTime = 0;
             usert.sounds[usert.currentSound].time.clear();
-            beats.play();  
-            played++;
+            //beats.play();    
+            play = TRUE;
         }
+        played++;
     }   
     
     //next song
@@ -885,9 +895,12 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
         if (beats.getIsPlaying()) {return;} //everything is inactive when sound is playing
         else 
         {
-            if (usert.currentSound > 0)
+            if (usert.currentSound > -1)
             {
-                if (usert.sounds[usert.currentSound].time.size()<1) usert.currentSound--;  
+                if (usert.sounds[usert.currentSound].time.size()<1) 
+                {
+                    usert.currentSound--;                      
+                }
                 else
                 {
                     //save the tapping to xml
@@ -903,6 +916,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             usert.setID(-1);
             usert.currentSound = -1;
             usert.deleteTranscription();
+            played = 0;
             
             //load the gui1     
             toggleInstructions1 = TRUE;
@@ -944,8 +958,9 @@ void testApp::guiEvent5(ofxUIEventArgs &e)
         //clear the data
         usert.setName("");
         usert.setID(-1);
-        usert.currentSound = 0;
+        usert.currentSound = -1;
         usert.deleteTranscription();
+        played = 0;
         
         //syncronize data
         //loadXmlUser("data/users.xml");              
