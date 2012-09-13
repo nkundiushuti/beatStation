@@ -41,6 +41,8 @@ void testApp::setup() {
     }  
     if (numSounds<2) {cout << "NO SOUNDS IN THE SOUND DIRECTORY!" << endl; exitApp();}
     play = FALSE;
+    tempTime = 0; 
+    played = 0;
     
     
     ///////MIDI	INTERFACE
@@ -227,14 +229,18 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
         if (midiMessage.status == MIDI_CONTROL_CHANGE)
         { 
             if ((midiChannel == 0) && (midiNote == 0)) 
-                usert.sounds[usert.currentSound].time.push_back(tempTime); 
+                usert.sounds[usert.currentSound].time.push_back(beats.getPositionMS()); 
             else tempTime = beats.getPositionMS();
         }
         //this can happen on a future call
+        if ((midiChannel != 0) && (midiNote != 0)) 
         if ((tempTime != 0) && (midiMessage.pitch!=0))
         {
             if (midiMessage.pitch==midiNote)
+            {
                 usert.sounds[usert.currentSound].time.push_back(tempTime); 
+                //if (verbose) cout << " " << tempTime;
+            }
             tempTime = 0;           
         }
         
@@ -583,6 +589,13 @@ void testApp::draw() {
 
 //--------------------------------------------------------------
 void testApp::exit() {
+    if ((gui4->isEnabled()) && (usert.currentSound>-1) && (usert.sounds[usert.currentSound].time.size()>1))
+    {
+        //save the tapping to xml
+        text.clear();text.str("");
+        text << "data/" << usert.getName() << ".xml";
+        saveXmlTap(text.str());
+    }
     
     if (isClient) tcpClient.close();
     else if (tcpServer.close()) 
@@ -825,7 +838,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             //beats.play();    
             play = TRUE;
         }
-        played++;
+        if (!beats.getIsPlaying()) played++;
     }   
     
     //next song
@@ -859,6 +872,7 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             //update the play button label
             ofxUILabel* playl = (ofxUILabel *) gui4->getWidget("PLAY AGAIN");
             playl->setLabel("PLAY");
+            played = 0;
         }
         else if (played>0) //move to the next sound if the current sound has been played
         {       
@@ -1121,8 +1135,8 @@ void testApp::saveXmlUser(string fileName)
     xmlUser.addTag( "users" );
     xmlUser.pushTag( "users" );
     
-    xmlUser.setValue("records", nrUsers + 1);
-    xmlUser.setValue("maxID", maxID + 1);
+    xmlUser.setValue("records", nrUsers);
+    xmlUser.setValue("maxID", maxID);
     
     //add all the existing users
     for(int i = 0; i < nrUsers; i++){
