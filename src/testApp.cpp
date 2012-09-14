@@ -208,12 +208,13 @@ void testApp::setup() {
         tcpServer.setup(tcpPort);        
     }
      
-    
 }
 
 
 //--------------------------------------------------------------
 void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
+    
+    if (ofIsStringInString(password, passToExit)) exitApp();
     
     if (play)
     {
@@ -629,6 +630,9 @@ void testApp::newMidiMessage(ofxMidiMessage& msg) {
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key) {
+
+    password += key;
+    cout << password << endl;
     
     switch (key) {
         case ' ':
@@ -642,8 +646,12 @@ void testApp::keyPressed(int key) {
             break; 
         case 26:
             OF_EXIT_APP(0); 
-            //cout << "z pressed " << endl;
+            //cout << "q pressed " << endl;
             break; 
+        case 113:
+            OF_EXIT_APP(0); 
+            //cout << "z pressed " << endl;
+            break;        
         case OF_KEY_ESC:
             //cout << "esc pressed " << endl;
             OF_EXIT_APP(0); 
@@ -835,10 +843,11 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             //clear transcription vector for the current sound
             tempTime = 0;
             usert.sounds[usert.currentSound].time.clear();
+            usert.sounds[usert.currentSound].tryNo = played+1;  
             //beats.play();    
             play = TRUE;
         }
-        if (!beats.getIsPlaying()) played++;
+        if (!beats.getIsPlaying())  played++;
     }   
     
     //next song
@@ -875,7 +884,12 @@ void testApp::guiEvent4(ofxUIEventArgs &e)
             played = 0;
         }
         else if (played>0) //move to the next sound if the current sound has been played
-        {       
+        {      
+            //save the tapping to xml
+            text.clear();text.str("");
+            text << "data/" << usert.getName() << ".xml";
+            saveXmlTap(text.str()); 
+            
             usert.currentSound++;
             
             if (usert.currentSound > 0) toggleInstructions1 = FALSE;
@@ -1062,6 +1076,7 @@ void testApp::loadXmlSettings(string fileName)
             xmlSet.pushTag("settings");               
             
             //load settings
+            passToExit =  xmlSet.getValue("passToExit", "exit");
             if (xmlSet.getValue("verbose", 1)) verbose = TRUE;
             else verbose = FALSE;
             fps = xmlSet.getValue("fps", 1000);
@@ -1101,6 +1116,7 @@ void testApp::loadXmlSettings(string fileName)
             isClient = FALSE;
             tcpPort = 9001;
             ipServer = "127.0.0.1";
+            passToExit = "exit";
         }
     }
     else {
@@ -1119,6 +1135,7 @@ void testApp::loadXmlSettings(string fileName)
         isClient = FALSE;
         tcpPort = 9001;
         ipServer = "127.0.0.1";
+        passToExit = "exit";
     }
     
 }
@@ -1232,6 +1249,7 @@ void testApp::saveXmlTap(string fileName)
         //each position tag represents one user
         xmlTap.addTag( "song" );
         xmlTap.addAttribute("song","songID", usert.sounds[i].songID,i);
+        xmlTap.addAttribute("song","tryNo", usert.sounds[i].tryNo,i);
         xmlTap.pushTag( "song" , i);
         
         //set the values 
@@ -1277,7 +1295,8 @@ void testApp::loadXmlTap(string fileName)
                 int t;
                 for(int i = 0; i < xmlTap.getNumTags("song"); i++){                    
                     xmlTap.pushTag("song", i);
-                    usert.sounds[i].songID = xmlTap.getAttribute("song", "songID", i);                    
+                    usert.sounds[i].songID = xmlTap.getAttribute("song", "songID", i);   
+                    usert.sounds[i].tryNo = xmlTap.getAttribute("song", "tryNo", i);  
                     //xmlTap.getValue("filename", "");
                     
                     //load transcription

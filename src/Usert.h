@@ -19,6 +19,7 @@ public:
     Transcription(){};
     
     int	songID;
+    int tryNo;
     vector<int> time;
     
     

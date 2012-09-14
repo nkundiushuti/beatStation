@@ -1,4 +1,5 @@
 <settings>
+    <passToExit>exit</passToExit>
     <verbose>1</verbose>
     <fps>1000</fps>
     <midiPort>0</midiPort>

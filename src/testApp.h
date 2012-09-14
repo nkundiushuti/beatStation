@@ -31,6 +31,7 @@ public:
     
     
     //SETTINGS
+    string passToExit;
     int fps;
     bool verbose;
     int midiPort;
@@ -123,6 +124,7 @@ public:
     int deltaTime, connectTime;	
     
     //UTILS
+    string password;
     bool is_number(string s);
      
 };
