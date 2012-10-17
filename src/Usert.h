@@ -20,8 +20,8 @@ public:
     
     int	songID;
     int tryNo;
-    vector<int> time;
-    
+    vector<int> time1;
+    vector<int> time2;
     
 };
 
@@ -29,10 +29,8 @@ class Usert {
 private:
     string name; //initials
     int ID; //unique id - index  
-    int age;
-    bool sex;
-    int yearsTraining;
-    int familiarity;
+    string fullName;
+    string date;
         
 public:
     
@@ -42,16 +40,12 @@ public:
         
     void setName (string uname){ name = uname; }
     string getName (){ return name; }
+    void setFullName (string ufname){ fullName = ufname; }
+    string getFullName (){ return fullName; }
+    void setDate (string udate){ date = udate; }
+    string getDate (){ return date; }
     void setID (int uID){ ID = uID; }
     int getID (){ return ID;}
-    void setAge (int uage){ age = uage; }
-    int getAge (){ return age; }
-    void setSex (int usex){ sex = usex; }
-    bool getSex (){ return sex; }
-    void setYears (int uyears){ yearsTraining = uyears; }
-    int getYears (){ return yearsTraining; }
-    void setFam (int ufam){ familiarity = ufam; }
-    int getFam (){ return familiarity; }
     void initTranscription (int n){ sounds = new Transcription[n]; } 
     void deleteTranscription (){ delete[] sounds; }
   

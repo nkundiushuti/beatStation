@@ -261,6 +261,12 @@ void ofxTextBlock::_trimLineSpaces()
                 if (lines[l].wordsID.size() > 0){
                     if (words[lines[l].wordsID[lines[l].wordsID.size() - 1]].rawWord == " ") lines[l].wordsID.erase(lines[l].wordsID.end() - 1);
                 }
+                
+                for(int j=0;j < lines[l].wordsID.size(); j++)
+                {
+                    while (string::npos != words[lines[l].wordsID[j]].rawWord.find("_")) { 
+                        words[lines[l].wordsID[j]].rawWord.replace(words[lines[l].wordsID[j]].rawWord.find("_"),1," ");}
+                }
             }
         }
 
@@ -382,20 +388,29 @@ int ofxTextBlock::wrapTextX(float lineWidth){
         {
 
             runningWidth += words[i].width;
-
-            if (runningWidth <= lineWidth) {
-                newLine = false;
-            }
-            else {
-
+            if (string::npos != words[i].rawWord.find("<>"))
+            {                
                 newLine = true;
                 lines.push_back(tmpLine);
                 tmpLine.wordsID.clear();
                 runningWidth = 0.0f + words[i].width;;
                 activeLine++;
-            }
+            }   
+            else
+            {
+                if (runningWidth <= lineWidth) {
+                    newLine = false;
+                }
+                else {
+                    newLine = true;
+                    lines.push_back(tmpLine);
+                    tmpLine.wordsID.clear();
+                    runningWidth = 0.0f + words[i].width;;
+                    activeLine++;
+                }
 
-            tmpLine.wordsID.push_back(i);
+                tmpLine.wordsID.push_back(i);
+            }
         }
 
         //Push in the final line.

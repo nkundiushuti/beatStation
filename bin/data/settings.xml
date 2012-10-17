@@ -1,17 +1,20 @@
 <settings>
     <passToExit>exit</passToExit>
     <verbose>1</verbose>
+    <fullscreen>1</fullscreen>
     <fps>1000</fps>
     <midiPort>0</midiPort>
     <midiChannel>0</midiChannel>
     <midiNote>0</midiNote>
     <noPlays>2</noPlays>
+    <minTaps>1</minTaps>
     <tapWithSpace>1</tapWithSpace>
+    <tapWithTab>1</tapWithTab>
     <canQuit>1</canQuit>
     <itemDimGUI>24</itemDimGUI>
     <launchScript>0</launchScript>
-    <scriptDirectory>xml_io_tools</scriptDirectory>
-    <appToLaunchPath>/Applications/MATLAB_R2011b.app/bin/matlab -nosplash -nodesktop -r "cd path , try, tapping xmlin xmlout, catch, handleTheError, end, exit"</appToLaunchPath>
+    <scriptDirectory>XML4MAT</scriptDirectory>
+    <appToLaunchPath>/Applications/Octave.app/Contents/Resources/bin/octave -qf --quiet --eval "clear all; cd path; tapping2('xmlin','xmlout');exit;"</appToLaunchPath>
     <isClient>0</isClient>
     <tcpPort>9001</tcpPort>
     <ipServer>127.0.0.1</ipServer>

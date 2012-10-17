@@ -29,6 +29,11 @@ class threadedObject : public ofThread{
            path ="";
            count = 0;
 		}
+    
+        bool isRunning()
+        {
+            return threadRunning;
+        }
 
 		void start(){
             startThread(true, false);   // blocking, verbose
@@ -48,7 +53,7 @@ class threadedObject : public ofThread{
                     count++;
                     system(path.c_str());
 					unlock();
-					ofSleepMillis(1 * 1000);
+                    //ofSleepMillis(1 * 1000);
                     stop();
 				}
 			}

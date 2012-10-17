@@ -200,7 +200,7 @@ enum ofxUIThemeType
 //#ifdef TARGET_ANDROID
 //#define OFX_UI_FONT_NAME "newmediafett.ttf"
 //#else
-#define OFX_UI_FONT_NAME "GUI/NewMedia Fett.ttf"
+#define OFX_UI_FONT_NAME "GUI/newmediafett.ttf"
 //#endif
 
 #define OFX_UI_FONT_RESOLUTION 150

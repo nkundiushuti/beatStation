@@ -9,6 +9,8 @@
 #include "threadedObject.h"
 #include "Usert.h"
 #include <sstream>
+#include <vector>
+using namespace std;
 
 
 
@@ -32,8 +34,10 @@ public:
     
     //SETTINGS
     string passToExit;
+    int minTaps;
     int fps;
     bool verbose;
+    bool fullscreen;
     int midiPort;
     int midiChannel;
     int midiNote;
@@ -42,14 +46,15 @@ public:
     string scriptDirectory;
     string appToLaunchPath;    
     bool tapWithSpace;
+    bool tapWithTab;
     bool canQuit;
     int itemDimGUI;
     bool isClient;
     int tcpPort;
     string ipServer;
-    string instrGUI1, instrGUI2;
-    ofxTextBlock instructions1,instructions2, results;    
-    bool toggleInstructions1,toggleInstructions2,toggleInstructions3, toggleResults;
+    string instrGUI1, instrGUI11, instrGUI2;
+    ofxTextBlock instructions1, instructions11, instructions2, results, scoreTable1, scoreTable2, scoreTable3, scoreTable4;    
+    bool toggleInstructions1, toggleInstructions11, toggleInstructions2,toggleInstructions3, toggleResults, toggleScore;
     stringstream text;   
     
     void loadXmlSettings(string fileName);
@@ -73,6 +78,7 @@ public:
     
     //GUI    
     ofxUICanvas *gui1,*gui2,*gui3, *gui4, *gui5;
+    ofImage* img; 
     
     void guiEvent1(ofxUIEventArgs &e);
     void guiEvent2(ofxUIEventArgs &e);
@@ -83,18 +89,22 @@ public:
     
     
     //USER
-    Usert usert; 
+    Usert usert;  
     vector<int>uIDs;
     vector<string>uNames;
-    vector<int>uMF;
-    vector<int>uAge;
-    vector<int>uYears;
-    vector<int>uFam;
+    vector<string>uFullNames;
+    vector<string>uDate;
+    //vector<int>uMF;
+    //vector<int>uAge;
+    //vector<int>uYears;
+    //vector<int>uFam;
     string tempName;
-    int tempAge;
-    int tempMF;
-    int tempYears;
-    int tempFam;
+    string tempFullName;
+    string tempDate;
+    //int tempAge;
+    //int tempMF;
+    //int tempYears;
+    //int tempFam;
     bool newUser;
     bool fromStart;
     int nrUsers;
@@ -113,6 +123,7 @@ public:
     
     //MATLAB
     threadedObject	matlabScript;
+    bool askResults;
     void callScript();  
     void loadXmlResults();
     
@@ -126,5 +137,32 @@ public:
     //UTILS
     string password;
     bool is_number(string s);
+    
+    
+    //HIGHSCORES
+    struct scores{
+        int uid;
+        string name;
+        float score;
+        int noTapped;
+    };    
+    struct MyClassComp
+    {
+        explicit MyClassComp(int i) { n = i;}
+        inline bool operator()(const scores & m) const { return m.uid == n; }
+        int n;
+    };    
+    vector<scores> highscores; 
+    void saveXmlScores(string fileName);        
+    void loadXmlScores(string fileName);
+    void getScoreTable();
+    int findName(int idToFind);    
+    void insertScore (int u, string i, float s, int n);    
+    static bool compareByLength(const scores &a, const scores &b)
+    {
+        if (a.score == b.score)
+            return (a.noTapped > b.noTapped);
+        else return a.score > b.score;   
+    }
      
 };
