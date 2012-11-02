@@ -19,7 +19,7 @@ The .app that you can find in the bin directory was built on Mac OS Lion and I s
 You need to download openFrameworks and copy the beatStation directory into the /apps/myapps directory and then build it with Xcode (open and build beatStation.xcodeproj) and run it.
 
 
-LINUX BUILD
+LINUX BUILD - check the linux version at https://github.com/nkundiushuti/beatStationLinux
 
 You will need to have Codeblocks installed.
 Download and install openframeworks for linux as specified on the website.
