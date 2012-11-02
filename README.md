@@ -24,11 +24,13 @@ LINUX BUILD
 You will need to have Codeblocks installed.
 Download and install openframeworks for linux as specified on the website.
 Download from github and copy in the addons directory, the following addons:
-ofxUI
-ofxXMLSettings
-ofxDirList
-ofxTextSuite
-ofxNetwork
+
+- ofxUI
+- ofxXMLSettings
+- ofxDirList
+- ofxTextSuite
+- ofxNetwork
+
 Copy the beatStation directory in the apps/myapps directory, open the codeblocks project(beatStation.cbp) and clean then build.
 We excluded ofxMidi from the Linux version because there are issues with rtMidi and ALSA drivers.
 
