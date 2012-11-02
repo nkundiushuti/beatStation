@@ -103,6 +103,12 @@ void testApp::setup() {
     } 
     getScoreTable();
     
+    //copyleft
+    copyleft.init("GUI/newmediafett.ttf", 12);
+    copyleft.setText(instrGUI1);
+    copyleft.setText("Copyright (c) 2012 by INESC TEC: Marius Miron, Andre Holzapfel, Matthew Davies, Fabien Gouyon. This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/. <> <> This work is partly-funded by the ERDF - European Regional Development Fund through the COMPETE Programme (operational programme for competitiveness) and by National Funds through the FCT - Fundacao para a Ciencia e a Tecnologia (Portuguese Foundation for Science and Technology) within project PTDC/EAT-MMU/112255/2009-(FCOM-01-0124-FEDER-014732)");
+    copyleft.wrapTextX(1.6*length); 
+    copyleft.setColor(240, 240, 240, 180); 
     
     //GUI USER
     gui1 = new ofxUICanvas(ofGetWidth()-length,ofGetHeight()/2,ofGetWidth(),ofGetHeight());		//ofxUICanvas(float x, float y, float width, float height)    
@@ -127,6 +133,18 @@ void testApp::setup() {
     ofxUILabel *errors = (ofxUILabel*) new ofxUILabel("ERRORS", OFX_UI_FONT_SMALL);
     errors->setVisible(FALSE);
     gui1->addWidgetSouthOf(errors,"ID");  
+    
+    /*
+    ofxUIRectangle *rect = (ofxUIRectangle *) spaceri->getRect();  
+    ofxUISpacer* spacerh = new ofxUISpacer(2*itemDimGUI + 1.1*length, itemDimGUI + rect->getY() ,1.1*length,2, "SPACERHIDDEN");
+    gui1->addWidget(spacerh);
+    spacerh->setVisible(FALSE);
+    imgc = new ofImage(); 
+    imgc->loadImage("copyleft.png"); 
+    ofxUIImage* guimgc = new ofxUIImage(2*itemDimGUI + ofGetHeight()-length, 0, imgc->width/2, imgc->height/2, imgc, "", TRUE);
+    gui1->addWidgetSouthOf(guimgc, "SPACERHIDDEN");
+     */
+    
     //gui1->centerWidgets();
     gui1->setDrawBack(false);
     //gui1->disable();     
@@ -677,6 +695,10 @@ void testApp::draw() {
         ofxUISpacer *label = (ofxUISpacer *) gui1->getWidget("SPACER");
         ofxUIRectangle *rect = (ofxUIRectangle *) label->getRect();  
         instructions11.drawLeft(2*itemDimGUI + rect->getX() + rect->getWidth() ,rect->getY());
+        
+        //draw copyleft
+        copyleft.drawLeft(2*itemDimGUI + rect->getX() + rect->getWidth(), itemDimGUI + instructions11.getHeight() + rect->getY());
+        
     }
     
     /*
@@ -1327,6 +1349,8 @@ void testApp::loadXmlSettings(string fileName)
             midiNote = xmlSet.getValue("midiNote", 46); 
             noPlays = xmlSet.getValue("noPlays", 2);
             minTaps = xmlSet.getValue("minTaps", 1);
+            if (xmlSet.getValue("randomFiles", 1)) randomFiles = TRUE;
+            else randomFiles = FALSE;
             if (xmlSet.getValue("tapWithTab", 1)) tapWithTab = TRUE;
             else tapWithTab = FALSE;
             if (xmlSet.getValue("tapWithSpace", 1)) tapWithSpace = TRUE;
@@ -1354,6 +1378,7 @@ void testApp::loadXmlSettings(string fileName)
             midiNote = 46;
             noPlays = 2;
             minTaps = 1;
+            randomFiles = TRUE;
             tapWithSpace = TRUE;
             tapWithTab = TRUE;
             canQuit = TRUE;
@@ -1376,6 +1401,7 @@ void testApp::loadXmlSettings(string fileName)
         midiNote = 46;
         noPlays = 2;
         minTaps = 1;
+        randomFiles = TRUE;
         tapWithSpace = TRUE;
         tapWithTab = TRUE;
         canQuit = TRUE;
@@ -1698,13 +1724,17 @@ void testApp::randomOrder(int uid)
     int* deck = new int[numSounds];
     for(int i = 0; i < numSounds; i++)  deck[i] = i+1;
     
-    while (i > 1) {
-        int k = rand() % numSounds;
-        i--;
-        t = deck[i];
-        deck[i] = deck[k];
-        deck[k] = t;
+    if (randomFiles)
+    {
+        while (i > 1) {
+            int k = rand() % numSounds;
+            i--;
+            t = deck[i];
+            deck[i] = deck[k];
+            deck[k] = t;
+        }
     }
+    
     for(int i = 0; i < numSounds; i++){ 
         usert.sounds[i].songID = deck[i]-1;
     }  

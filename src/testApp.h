@@ -42,6 +42,7 @@ public:
     int midiChannel;
     int midiNote;
     int noPlays;
+    bool randomFiles;
     bool launchScript;
     string scriptDirectory;
     string appToLaunchPath;    
@@ -53,8 +54,8 @@ public:
     int tcpPort;
     string ipServer;
     string instrGUI1, instrGUI11, instrGUI2;
-    ofxTextBlock instructions1, instructions11, instructions2, results, scoreTable1, scoreTable2, scoreTable3, scoreTable4;    
-    bool toggleInstructions1, toggleInstructions11, toggleInstructions2,toggleInstructions3, toggleResults, toggleScore;
+    ofxTextBlock instructions1, instructions11, instructions2, results, scoreTable1, scoreTable2, scoreTable3, scoreTable4, copyleft;    
+    bool toggleInstructions1, toggleInstructions11, toggleInstructions2,toggleInstructions3, toggleResults, toggleScore, toggleCopyleft;
     stringstream text;   
     
     void loadXmlSettings(string fileName);
@@ -78,7 +79,7 @@ public:
     
     //GUI    
     ofxUICanvas *gui1,*gui2,*gui3, *gui4, *gui5;
-    ofImage* img; 
+    ofImage* img, *imgc; 
     
     void guiEvent1(ofxUIEventArgs &e);
     void guiEvent2(ofxUIEventArgs &e);

@@ -1,14 +1,37 @@
 beatStation
 ===========
 
-beatStation - an openFrameworks tapping recorder interface 
+beatStation - an openFrameworks tapping recorder interface
 
-MACOS INSTALL
+This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/.
+This work is partly-funded by the ERDF – European Regional Development Fund through the COMPETE Programme (operational programme for competitiveness) and by National Funds through the FCT – Fundação para a Ciência e a Tecnologia (Portuguese Foundation for Science and Technology) within project "PTDC/EAT-MMU/112255/2009-(FCOM-01-0124-FEDER-014732)"
+
+
+BUILDING 
+
+MACOS BUILD
+You will need Mac Os version minimum 10.6 and XCode if you want to build the project again on your machine.
 The .app that you can find in the bin directory was built on Mac OS Lion and I suggest rebuilding it on your system. 
-You need to download openFrameworks and copy the beatStation directory into the /apps/myapps directory and then build it and run it.
+You need to download openFrameworks and copy the beatStation directory into the /apps/myapps directory and then build it with Xcode (open and build beatStation.xcodeproj) and run it.
+
+LINUX BUILD
+You will need to have Codeblocks installed.
+Download and install openframeworks for linux as specified on the website.
+Download from github and copy in the addons directory, the following addons:
+ofxUI
+ofxXMLSettings
+ofxDirList
+ofxTextSuite
+ofxNetwork
+Copy the beatStation directory in the apps/myapps directory, open the codeblocks project(beatStation.cbp) and clean then build.
+We excluded ofxMidi from the Linux version because there are issues with rtMidi and ALSA drivers.
+
 IMPORTANT - you must copy some audio files in the sounds directory before starting the app
 
-LINUX AND WINDOWS - to be done
+WINDOWS - to be done
+
+
+FUNCTIONALITIES
 
 The app has an user management system and a tapping recording system, as well as an ability to run tests on different machines connected in a client-server architecture. 
 
@@ -56,6 +79,8 @@ Several parameters can be modified using the settings.xml file
     <noPlays>2</noPlays> - maximum number of times you can listen a song
 
     <minTaps>1</minTaps> - minimum number of song tapped after which the score is displayed
+    
+    <randomFiles>1</randomFiles> - play the file in an unique random order for each user
 
     <tapWithSpace>1</tapWithSpace>
 

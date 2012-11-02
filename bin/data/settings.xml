@@ -8,6 +8,7 @@
     <midiNote>0</midiNote>
     <noPlays>2</noPlays>
     <minTaps>1</minTaps>
+    <randomFiles>1</randomFiles>
     <tapWithSpace>1</tapWithSpace>
     <tapWithTab>1</tapWithTab>
     <canQuit>1</canQuit>

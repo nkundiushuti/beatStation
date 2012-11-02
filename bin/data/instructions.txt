@@ -1,9 +1,2 @@
-Click PLAY, listen and tap your perception of the beats using the SPACE bar ONLY. Then, click NEXT SONG to move on. 
+Change this to anything you might want to include as instructions.
 <> <>
-You can hear each song and tap the beats twice.
-So, if you're not happy the first time you can have another go, by clicking the PLAY AGAIN button.
-<> <>
-You can leave the experiment at any time by clicking the QUIT button on the screen.
-If you wish to resume another time, please note down your login ID.
-<> <>
-To qualify as best tapper, you must tap to at least FIVE music examples.
