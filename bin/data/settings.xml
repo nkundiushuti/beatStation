@@ -2,7 +2,7 @@
     <passToExit>exit</passToExit>
     <verbose>1</verbose>
     <fullscreen>1</fullscreen>
-    <fps>1000</fps>
+    <fps>100</fps>
     <midiPort>0</midiPort>
     <midiChannel>0</midiChannel>
     <midiNote>0</midiNote>

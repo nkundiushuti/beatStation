@@ -8,7 +8,6 @@ This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 U
 This work is partly-funded by the ERDF - European Regional Development Fund through the COMPETE Programme (operational programme for competitiveness) and by National Funds through the FCT-  Fundacao para a Ciencia e a Tecnologia (Portuguese Foundation for Science and Technology) within project "PTDC/EAT-MMU/112255/2009-(FCOM-01-0124-FEDER-014732)"
 
 
-
 BUILDING 
 
 
@@ -21,9 +20,11 @@ You need to download openFrameworks and copy the beatStation directory into the 
 
 LINUX BUILD - check the linux version at https://github.com/nkundiushuti/beatStationLinux
 
+I suggest you rebuild the beatStation as the version included was built on 32 bit Ubuntu.
+
 You will need to have Codeblocks installed.
 Download and install openframeworks for linux as specified on the website.
-Download from github and copy in the addons directory, the following addons:
+Unpack addons.zip or download from github and copy in the openframeworks addons directory(not the project addons!), the following addons:
 
 - ofxUI
 - ofxXMLSettings
@@ -31,8 +32,9 @@ Download from github and copy in the addons directory, the following addons:
 - ofxTextSuite
 - ofxNetwork
 
-Copy the beatStation directory in the apps/myapps directory, open the codeblocks project(beatStation.cbp) and clean then build.
+Copy the beatStation directory in the apps/myapps directory, open the codeblocks project(beatStation.cbp) and CLEAN then BUILD.
 We excluded ofxMidi from the Linux version because there are issues with rtMidi and ALSA drivers.
+
 
 IMPORTANT - you must copy some audio files in the sounds directory before starting the app
 
