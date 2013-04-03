@@ -52,6 +52,7 @@ void testApp::setup() {
     loadXmlScores("data/scores.xml"); 
     
     ///////MIDI	INTERFACE
+    if (verbose) midiIn.listPorts();
 	midiIn.openPort(midiPort);
 	//midiIn.openPort("IAC Pure Data In");	// by name
 	midiIn.ignoreTypes(false, false, false);
@@ -293,30 +294,10 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
         beats.play();
         play = FALSE;
     }
-    
-    //WHILE SOUND PLAYING, GET MIDI TAPPING, UPDATE ROTARY SLIDER
+   
+    //WHILE SOUND PLAYING, UPDATE ROTARY SLIDER
     if (beats.getIsPlaying())
-    {
-        ////TO BE TESTED
-        if (midiMessage.status == MIDI_CONTROL_CHANGE)
-        { 
-            if ((midiChannel == 0) && (midiNote == 0)) 
-                usert.sounds[usert.currentSound].time1.push_back(beats.getPositionMS()); 
-            else tempTime = beats.getPositionMS();
-        }
-        //this can happen on a future call
-        if ((midiChannel != 0) && (midiNote != 0)) 
-            if ((tempTime != 0) && (midiMessage.pitch!=0))
-            {
-                if (midiMessage.pitch==midiNote)
-                {
-                    usert.sounds[usert.currentSound].time1.push_back(tempTime); 
-                    //if (verbose) cout << " " << tempTime;
-                }
-                tempTime = 0;           
-            }
-        
-        
+    {       
         //update playing widget
         ofxUIRotarySlider *rotary = (ofxUIRotarySlider *) gui4->getWidget("%");
         rotary->setValue(beats.getPosition()*100);
@@ -341,13 +322,11 @@ void testApp::update() {    //cout << ofGetElapsedTimeMillis() << " ";
     
     //SET VOLUME
     ofxUISlider *volume = (ofxUISlider *) gui4->getWidget("VOL");
-    beats.setVolume(volume->getValue());
-    
+    beats.setVolume(volume->getValue());    
     
     
     if (launchScript) 
-    {        
-               
+    {          
         
         if (askResults)
         {
@@ -786,6 +765,37 @@ void testApp::newMidiMessage(ofxMidiMessage& msg) {
     
 	// make a copy of the latest message
 	midiMessage = msg;
+    
+    if (midiMessage.status == MIDI_CONTROL_CHANGE) cout << " BEAT ";
+    
+    if (beats.getIsPlaying())
+    {
+        
+        ////TO BE TESTED
+        if (midiMessage.status == MIDI_CONTROL_CHANGE)
+        { 
+            if (verbose) cout << "BEAT ";
+            if ((midiChannel == 0) && (midiNote == 0)) 
+                usert.sounds[usert.currentSound].time1.push_back(beats.getPositionMS()); 
+            else tempTime = beats.getPositionMS();
+        }
+        
+        //this can happen on a future call
+        if ((midiChannel != 0) && (midiNote != 0)) 
+            if ((tempTime != 0) && (midiMessage.pitch!=0))
+            { 
+                if (verbose) cout << "  " << midiMessage.pitch;
+                if (midiMessage.pitch==midiNote)
+                {
+                    usert.sounds[usert.currentSound].time1.push_back(tempTime); 
+                }
+                else if (midiMessage.pitch==midiNote2)
+                {
+                     usert.sounds[usert.currentSound].time2.push_back(tempTime); 
+                }
+                tempTime = 0;           
+            }
+    }
 }
 
 //--------------------------------------------------------------
@@ -1346,7 +1356,8 @@ void testApp::loadXmlSettings(string fileName)
             fps = xmlSet.getValue("fps", 1000);
             midiPort = xmlSet.getValue("midiPort", 0);
             midiChannel = xmlSet.getValue("midiChannel", 10);
-            midiNote = xmlSet.getValue("midiNote", 46); 
+            midiNote = xmlSet.getValue("midiNote", 36); 
+            midiNote2 = xmlSet.getValue("midiNote2", 38); 
             noPlays = xmlSet.getValue("noPlays", 2);
             minTaps = xmlSet.getValue("minTaps", 1);
             if (xmlSet.getValue("randomFiles", 1)) randomFiles = TRUE;
@@ -1375,7 +1386,8 @@ void testApp::loadXmlSettings(string fileName)
             fps = 1000;
             midiPort = 0;
             midiChannel = 10;
-            midiNote = 46;
+            midiNote = 36;
+            midiNote2 = 38;
             noPlays = 2;
             minTaps = 1;
             randomFiles = TRUE;

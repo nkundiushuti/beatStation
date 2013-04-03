@@ -41,6 +41,7 @@ public:
     int midiPort;
     int midiChannel;
     int midiNote;
+    int midiNote2;
     int noPlays;
     bool randomFiles;
     bool launchScript;
@@ -63,7 +64,8 @@ public:
     
     //MIDI
     int tempTime;
-	void newMidiMessage(ofxMidiMessage& eventArgs);		
+	void newMidiMessage(ofxMidiMessage& eventArgs);		    
+    void newMidiListener(ofxMidiMessage& eventArgs);
 	ofxMidiIn midiIn;
 	ofxMidiMessage midiMessage;
     

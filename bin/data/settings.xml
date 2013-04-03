@@ -2,10 +2,11 @@
     <passToExit>exit</passToExit>
     <verbose>1</verbose>
     <fullscreen>1</fullscreen>
-    <fps>100</fps>
-    <midiPort>0</midiPort>
-    <midiChannel>0</midiChannel>
-    <midiNote>0</midiNote>
+    <fps>60</fps>
+    <midiPort>2</midiPort>
+    <midiChannel>10</midiChannel>
+    <midiNote>36</midiNote>
+    <midiNote2>38</midiNote2>
     <noPlays>2</noPlays>
     <minTaps>1</minTaps>
     <randomFiles>1</randomFiles>
