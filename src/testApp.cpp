@@ -766,7 +766,7 @@ void testApp::newMidiMessage(ofxMidiMessage& msg) {
 	// make a copy of the latest message
 	midiMessage = msg;
     
-    if (midiMessage.status == MIDI_CONTROL_CHANGE) cout << " BEAT ";
+    //if (midiMessage.status == MIDI_CONTROL_CHANGE) cout << " BEAT ";
     
     if (beats.getIsPlaying())
     {
@@ -774,7 +774,7 @@ void testApp::newMidiMessage(ofxMidiMessage& msg) {
         ////TO BE TESTED
         if (midiMessage.status == MIDI_CONTROL_CHANGE)
         { 
-            if (verbose) cout << "BEAT ";
+            //if (verbose) cout << "BEAT ";
             if ((midiChannel == 0) && (midiNote == 0)) 
                 usert.sounds[usert.currentSound].time1.push_back(beats.getPositionMS()); 
             else tempTime = beats.getPositionMS();
@@ -784,7 +784,7 @@ void testApp::newMidiMessage(ofxMidiMessage& msg) {
         if ((midiChannel != 0) && (midiNote != 0)) 
             if ((tempTime != 0) && (midiMessage.pitch!=0))
             { 
-                if (verbose) cout << "  " << midiMessage.pitch;
+                //if (verbose) cout << "  " << midiMessage.pitch;
                 if (midiMessage.pitch==midiNote)
                 {
                     usert.sounds[usert.currentSound].time1.push_back(tempTime); 
