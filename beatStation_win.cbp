@@ -2,11 +2,11 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="InputExample" />
+		<Option title="beatStation_win" />
 		<Option makefile="makefile" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="addons\;src\;addons\ofxMidi\;addons\ofxMidi\src\;addons\ofxMidi\src\desktop\;addons\ofxMidi\src\desktop\rtmidi\;" />
+		<Option virtualFolders="addons\;src\;addons\ofxMidi\;addons\ofxMidi\src\;addons\ofxMidi\src\desktop\;addons\ofxMidi\src\desktop\rtmidi\;addons\ofxTextSuite\;addons\ofxXmlSettings\;addons\ofxNetwork\;" />
 		<Build>
 			<Target title="release">
 				<Option output="bin\$(PROJECT_NAME)" prefix_auto="1" extension_auto="1" />
@@ -69,6 +69,12 @@
 			<Add directory="..\..\..\libs\cairo\include\cairo" />
 			<Add directory="..\..\..\addons\ofxMidi\src" />
 			<Add directory="..\..\..\addons\ofxMidi\src\desktop\rtmidi" />
+			<Add directory="..\..\..\addons\ofxDirList\src" />
+			<Add directory="..\..\..\addons\ofxNetwork\src" />
+			<Add directory="..\..\..\addons\ofxUI\src" />
+			<Add directory="..\..\..\addons\ofxXmlSettings\src" />
+			<Add directory="..\..\..\addons\ofxTextSuite\src" />
+			<Add directory="..\..\..\addons\ofxXmlSettings\libs" />
 		</Compiler>
 		<Linker>
 			<Add library="..\..\..\libs\FreeImage\lib\win_cb\FreeImage.lib" />
@@ -102,21 +108,18 @@
 			<Add library="wsock32" />
 			<Add library="ws2_32" />
 			<Add library="Iphlpapi" />
+			<Add directory="..\..\..\addons\ofxNetwork\src" />
+			<Add directory="..\..\..\addons\ofxDirList\src" />
+			<Add directory="..\..\..\addons\ofxTextSuite\src" />
+			<Add directory="..\..\..\addons\ofxXmlSettings\libs" />
+			<Add directory="..\..\..\addons\ofxXmlSettings\src" />
+			<Add directory="..\..\..\addons\ofxUI\src" />
 		</Linker>
 		<ExtraCommands>
 			<Add after='xcopy /e /i /y &quot;$(PROJECT_DIR)..\..\..\export\win_cb\*.dll&quot;  &quot;$(PROJECT_DIR)bin&quot;' />
 			<Add after='cmd /c if not exist &quot;$(PROJECT_DIR)bin/data&quot; mkdir &quot;$(PROJECT_DIR)bin/data&quot;' />
 			<Mode after="always" />
 		</ExtraCommands>
-		<Unit filename="src\main.cpp">
-			<Option virtualFolder="src" />
-		</Unit>
-		<Unit filename="src\testApp.cpp">
-			<Option virtualFolder="src" />
-		</Unit>
-		<Unit filename="src\testApp.h">
-			<Option virtualFolder="src" />
-		</Unit>
 		<Unit filename="..\..\..\addons\ofxMidi\src\desktop\ofxRtMidiIn.cpp">
 			<Option virtualFolder="addons\ofxMidi\src\desktop\" />
 		</Unit>
@@ -173,6 +176,78 @@
 		</Unit>
 		<Unit filename="..\..\..\addons\ofxMidi\src\ofxMidiTypes.h">
 			<Option virtualFolder="addons\ofxMidi\src\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxNetwork.h">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxNetworkUtils.h">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxTCPClient.cpp">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxTCPClient.h">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxTCPManager.cpp">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxTCPManager.h">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxTCPServer.cpp">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxTCPServer.h">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxUDPManager.cpp">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxNetwork\src\ofxUDPManager.h">
+			<Option virtualFolder="addons\ofxNetwork\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxTextSuite\src\ofxTextBlock.cpp">
+			<Option virtualFolder="addons\ofxTextSuite\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxTextSuite\src\ofxTextBlock.h">
+			<Option virtualFolder="addons\ofxTextSuite\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxTextSuite\src\ofxTextSuite.h">
+			<Option virtualFolder="addons\ofxTextSuite\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxXmlSettings\libs\tinyxml.cpp">
+			<Option virtualFolder="addons\ofxXmlSettings\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxXmlSettings\libs\tinyxml.h">
+			<Option virtualFolder="addons\ofxXmlSettings\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxXmlSettings\libs\tinyxmlerror.cpp">
+			<Option virtualFolder="addons\ofxXmlSettings\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxXmlSettings\libs\tinyxmlparser.cpp">
+			<Option virtualFolder="addons\ofxXmlSettings\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.cpp">
+			<Option virtualFolder="addons\ofxXmlSettings\" />
+		</Unit>
+		<Unit filename="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.h">
+			<Option virtualFolder="addons\ofxXmlSettings\" />
+		</Unit>
+		<Unit filename="src\Usert.h">
+			<Option virtualFolder="src\" />
+		</Unit>
+		<Unit filename="src\main.cpp">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="src\testApp.cpp">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="src\testApp.h">
+			<Option virtualFolder="src" />
+		</Unit>
+		<Unit filename="src\threadedObject.h">
+			<Option virtualFolder="src\" />
 		</Unit>
 		<Extensions>
 			<code_completion />

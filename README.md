@@ -1,31 +1,53 @@
 beatStation
 ===========
 
-beatStation - an openFrameworks tapping recorder interface
+beatStation - an openFrameworks tapping recorder
 
 This work is licensed under the Creative Commons Attribution-NonCommercial 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc/3.0/.
 
 This work is partly-funded by the ERDF - European Regional Development Fund through the COMPETE Programme (operational programme for competitiveness) and by National Funds through the FCT-  Fundacao para a Ciencia e a Tecnologia (Portuguese Foundation for Science and Technology) within project "PTDC/EAT-MMU/112255/2009-(FCOM-01-0124-FEDER-014732)"
 
+========================
+USAGE
+========================
 
+The already build binaries can be download from: https://sourceforge.net/projects/beatstation/
+
+Download the archive and extract/copy the directory on your local hard drive. 
+
+Before starting the app you need to copy 2 or more sound files to annotate in the data/sounds/ subdirectory. 
+
+You can also adjust different settings from the settings file. Take a look at the wiki page for more info. For instance, you can choose to tap with a midi interface or just use the keyboard. 
+
+beatStation was designed as a game with a purpose application in which users can compete between each other in tapping various songs. In this setup, you need to have Octave or Matlab installed in order to compute the score for each user.
+
+beatStation can be used by researchers to annotate audio, conduct experiments, or as an inspiration for future apps.
+
+Contact me at miron.marius [at] gmail [dot] com for future questions
+
+
+========================
 BUILDING 
+========================
 
+These are the MAC OSX and Windows versions. for the linux version go at: https://github.com/nkundiushuti/beatStationLinux
 
+========================
 MACOS BUILD
+========================
 
-You will need Mac Os version minimum 10.6 and XCode if you want to build the project again on your machine.
+You will need Mac Os version minimum 10.6 and XCode if you want to build the project again on your machine. You will also need the version 0.7.1 of openFrameworks. It is not likely that the latest version of openFrameworks will work with this app.
 The .app that you can find in the bin directory was built on Mac OS Lion and I suggest rebuilding it on your system. 
 You need to download openFrameworks and copy the beatStation directory into the /apps/myapps directory and then build it with Xcode (open and build beatStation.xcodeproj) and run it.
 
+========================
+WINDOWS BUILD
+========================
 
-LINUX BUILD - check the linux version at https://github.com/nkundiushuti/beatStationLinux
-
-I suggest you rebuild the beatStation as the version included was built on 32 bit Ubuntu.
-
-You will need to have Codeblocks installed.
-Download and install openframeworks for linux as specified on the website.
+You will need to have Codeblocks 10 installed.
+Download and install openframeworks 0.7.1 for linux and Codeblocks as specified on the website.
+Building DOES NOT work with later versions of Openframeworks or Codeblocks 
 Unpack addons.zip or download from github and copy in the openframeworks addons directory(not the project addons!), the following addons:
-
 - ofxUI
 - ofxXMLSettings
 - ofxDirList
@@ -33,16 +55,14 @@ Unpack addons.zip or download from github and copy in the openframeworks addons 
 - ofxNetwork
 
 Copy the beatStation directory in the apps/myapps directory, open the codeblocks project(beatStation.cbp) and CLEAN then BUILD.
-We excluded ofxMidi from the Linux version because there are issues with rtMidi and ALSA drivers.
 
 
 IMPORTANT - you must copy some audio files in the sounds directory before starting the app
 
-WINDOWS - to be done
 
-
-
+========================
 FUNCTIONALITIES
+========================
 
 The app has an user management system and a tapping recording system, as well as an ability to run tests on different machines connected in a client-server architecture. 
 

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="release" />
+	<File name="..\..\..\addons\ofxXmlSettings\src\ofxXmlSettings.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="939" topLine="26" />
+	</File>
+	<File name="src\testApp.cpp" open="1" top="1" tabpos="2">
+		<Cursor position="1090" topLine="36" />
+	</File>
+	<File name="src\testApp.h" open="1" top="0" tabpos="1">
+		<Cursor position="1727" topLine="64" />
+	</File>
+</CodeBlocks_layout_file>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_file>
-	<Workspace title="InputExample">
+	<Workspace title="beatStation_win">
+		<Project filename="beatStation_win.cbp" active="1" />
 		<Project filename="../../../libs/openFrameworksCompiled/project/win_cb/openFrameworksLib.cbp" />
-		<Project filename="InputExample_win.cbp" active="1" />
 	</Workspace>
 </CodeBlocks_workspace_file>
